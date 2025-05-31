@@ -6,28 +6,28 @@ use serde_json::Value;
 pub fn json_to_py(py: Python<'_>, value: &Value) -> PyResult<PyObject> {
     match value {
         Value::Null => Ok(py.None()),
-        Value::Bool(b) => Ok(b.to_object(py)),
+        Value::Bool(b) => Ok(b.into_pyobject(py)?.to_owned().into()),
         Value::Number(n) => {
             if let Some(i) = n.as_i64() {
-                Ok(i.to_object(py))
+                Ok(i.into_pyobject(py)?.to_owned().into())
             } else if let Some(u) = n.as_u64() {
-                Ok(u.to_object(py))
+                Ok(u.into_pyobject(py)?.to_owned().into())
             } else if let Some(f) = n.as_f64() {
-                Ok(f.to_object(py))
+                Ok(f.into_pyobject(py)?.to_owned().into())
             } else {
                 Ok(py.None())
             }
         }
-        Value::String(s) => Ok(s.to_object(py)),
+        Value::String(s) => Ok(s.into_pyobject(py)?.to_owned().into()),
         Value::Array(arr) => {
-            let list = PyList::empty_bound(py);
+            let list = PyList::empty(py);
             for item in arr {
                 list.append(json_to_py(py, item)?)?;
             }
             Ok(list.into())
         }
         Value::Object(map) => {
-            let dict = PyDict::new_bound(py);
+            let dict = PyDict::new(py);
             for (key, val) in map {
                 dict.set_item(key, json_to_py(py, val)?)?;
             }

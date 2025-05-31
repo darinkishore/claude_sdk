@@ -4,11 +4,11 @@ use crate::python::models::{TextBlock, ToolUseBlock, ThinkingBlock, ImageBlock, 
 
 fn content_block_to_py(py: Python<'_>, block: &ContentBlock) -> PyObject {
     match block {
-        ContentBlock::Text { text } => Py::new(py, TextBlock { text: text.clone() }).unwrap().into_py(py),
-        ContentBlock::Thinking { thinking, signature } => Py::new(py, ThinkingBlock { thinking: thinking.clone(), signature: signature.clone() }).unwrap().into_py(py),
-        ContentBlock::ToolUse { id, name, input } => Py::new(py, ToolUseBlock::from_content_block(id.clone(), name.clone(), input.clone())).unwrap().into_py(py),
-        ContentBlock::ToolResult { tool_use_id, content, is_error } => Py::new(py, ToolResultBlock { tool_use_id: tool_use_id.clone(), content: content.as_ref().map(|c| c.as_text()), is_error: *is_error }).unwrap().into_py(py),
-        ContentBlock::Image { source } => Py::new(py, ImageBlock { source_type: source.source_type.clone(), media_type: source.media_type.clone(), data: source.data.clone() }).unwrap().into_py(py),
+        ContentBlock::Text { text } => Py::new(py, TextBlock { text: text.clone() }).unwrap().into(),
+        ContentBlock::Thinking { thinking, signature } => Py::new(py, ThinkingBlock { thinking: thinking.clone(), signature: signature.clone() }).unwrap().into(),
+        ContentBlock::ToolUse { id, name, input } => Py::new(py, ToolUseBlock::from_content_block(id.clone(), name.clone(), input.clone())).unwrap().into(),
+        ContentBlock::ToolResult { tool_use_id, content, is_error } => Py::new(py, ToolResultBlock { tool_use_id: tool_use_id.clone(), content: content.as_ref().map(|c| c.as_text()), is_error: *is_error }).unwrap().into(),
+        ContentBlock::Image { source } => Py::new(py, ImageBlock { source_type: source.source_type.clone(), media_type: source.media_type.clone(), data: source.data.clone() }).unwrap().into(),
     }
 }
 use std::collections::HashMap;
@@ -210,7 +210,7 @@ pub struct Session {
 impl Session {
     #[getter]
     fn tool_costs(&self, py: Python<'_>) -> PyResult<PyObject> {
-        let dict = pyo3::types::PyDict::new_bound(py);
+        let dict = pyo3::types::PyDict::new(py);
         for (tool, count) in &self.inner.metadata.tool_usage_count {
             // Simple cost distribution based on usage count
             let tool_cost = if self.inner.metadata.total_tool_calls > 0 {
@@ -452,7 +452,7 @@ impl Project {
         }
         
         // Create Python list of sessions
-        let sessions_list = pyo3::types::PyList::empty_bound(py);
+        let sessions_list = pyo3::types::PyList::empty(py);
         let sessions_count = sessions.len();
         for session in sessions {
             // Convert each Session to a PyObject
