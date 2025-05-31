@@ -21,10 +21,10 @@ thiserror = "2.0.12"
 
 # File I/O and threading
 crossbeam = "0.8"
-dirs = "5.0"
+dirs = "6.0"
 
 # Python bindings
-pyo3 = { version = "0.22", features = ["extension-module", "abi3-py311"] }
+pyo3 = { version = "0.25", features = ["extension-module", "abi3-py311"] }
 
 [dev-dependencies]
 tempfile = "3.20"
