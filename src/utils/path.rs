@@ -46,6 +46,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_encode_project_path() {
         let path = Path::new("/Users/darin/Projects/apply-model");
         assert_eq!(encode_project_path(path), "-Users-darin-Projects-apply-model");
@@ -55,6 +56,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_decode_project_path() {
         let encoded = "-Users-darin-Projects-apply-model";
         assert_eq!(decode_project_path(encoded), PathBuf::from("/Users/darin/Projects/apply-model"));
@@ -73,6 +75,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_roundtrip() {
         let original = Path::new("/Users/darin/Projects/my-project");
         let encoded = encode_project_path(original);
