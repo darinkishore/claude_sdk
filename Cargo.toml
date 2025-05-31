@@ -1,0 +1,31 @@
+[package]
+name = "claude-sdk"
+version = "0.1.0"
+edition = "2021"
+exclude = ["python/"]
+
+[lib]
+name = "claude_sdk"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+python = ["pyo3/extension-module"]
+
+[dependencies]
+# Core parsing and data types
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.17", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0.12"
+
+# File I/O and threading
+crossbeam = "0.8"
+dirs = "5.0"
+
+# Python bindings
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py311"] }
+
+[dev-dependencies]
+tempfile = "3.20"
