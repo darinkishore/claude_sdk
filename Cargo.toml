@@ -2,7 +2,6 @@
 name = "claude-sdk"
 version = "0.1.0"
 edition = "2021"
-exclude = ["python/"]
 
 [lib]
 name = "claude_sdk"

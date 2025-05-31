@@ -1,4 +1,4 @@
-use rust_sdk::SessionParser;
+use claude_sdk::SessionParser;
 use std::path::PathBuf;
 use std::env;
 
@@ -103,7 +103,7 @@ fn test_parse_real_sessions_impl() {
                 total_errors += 1;
                 
                 match e {
-                    rust_sdk::ClaudeError::ParseError(rust_sdk::ParseError::EmptyFile) => {
+                    claude_sdk::ClaudeError::ParseError(claude_sdk::ParseError::EmptyFile) => {
                         empty_file_errors += 1;
                     }
                     _ => {
@@ -237,7 +237,7 @@ fn test_tool_extraction_real_data() {
                 }
                 
                 // Analyze patterns
-                let patterns = rust_sdk::utils::analyze_tool_patterns(&tools);
+                let patterns = claude_sdk::utils::analyze_tool_patterns(&tools);
                 println!("\nTool usage patterns:");
                 for pattern in patterns.iter().take(5) {
                     println!("  {}: {} calls, {:.1}% success rate, avg {:.0}ms",

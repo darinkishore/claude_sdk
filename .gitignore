@@ -88,7 +88,6 @@ Thumbs.db
 !example*.jsonl  # Keep example files if any
 
 # Old/backup directories
-old_*/
 backup_*/
 *_old/
 *_backup/

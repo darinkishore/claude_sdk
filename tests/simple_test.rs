@@ -1,4 +1,4 @@
-use rust_sdk::SessionParser;
+use claude_sdk::SessionParser;
 
 #[test]
 fn test_single_file() {
