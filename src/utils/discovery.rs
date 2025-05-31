@@ -1,15 +1,17 @@
 use std::path::{Path, PathBuf};
 use std::fs;
 
+use crate::error::ClaudeError;
+
 /// Find all JSONL session files in a directory
-pub fn discover_sessions(base_path: &Path, project_filter: Option<&str>) -> Result<Vec<PathBuf>, std::io::Error> {
+pub fn discover_sessions(base_path: &Path, project_filter: Option<&str>) -> Result<Vec<PathBuf>, ClaudeError> {
     let mut sessions = Vec::new();
     
     if !base_path.exists() {
         return Err(std::io::Error::new(
             std::io::ErrorKind::NotFound,
             format!("Directory not found: {}", base_path.display())
-        ));
+        ).into());
     }
     
     // If project filter is provided, look only in that project directory
@@ -35,14 +37,14 @@ pub fn discover_sessions(base_path: &Path, project_filter: Option<&str>) -> Resu
 }
 
 /// Find all project directories in the base path
-pub fn discover_projects(base_path: &Path) -> Result<Vec<PathBuf>, std::io::Error> {
+pub fn discover_projects(base_path: &Path) -> Result<Vec<PathBuf>, ClaudeError> {
     let mut projects = Vec::new();
     
     if !base_path.exists() {
         return Err(std::io::Error::new(
             std::io::ErrorKind::NotFound,
             format!("Directory not found: {}", base_path.display())
-        ));
+        ).into());
     }
     
     // Find all directories that start with "-" (Claude Code encoding)
@@ -73,7 +75,7 @@ pub fn discover_projects(base_path: &Path) -> Result<Vec<PathBuf>, std::io::Erro
 }
 
 /// Collect JSONL files in a single directory (non-recursive)
-fn collect_jsonl_files(dir: &Path, sessions: &mut Vec<PathBuf>) -> Result<(), std::io::Error> {
+fn collect_jsonl_files(dir: &Path, sessions: &mut Vec<PathBuf>) -> Result<(), ClaudeError> {
     for entry in fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
@@ -90,7 +92,7 @@ fn collect_jsonl_files(dir: &Path, sessions: &mut Vec<PathBuf>) -> Result<(), st
 }
 
 /// Recursively collect JSONL files from all subdirectories
-fn collect_jsonl_files_recursive(dir: &Path, sessions: &mut Vec<PathBuf>) -> Result<(), std::io::Error> {
+fn collect_jsonl_files_recursive(dir: &Path, sessions: &mut Vec<PathBuf>) -> Result<(), ClaudeError> {
     for entry in fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
