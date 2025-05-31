@@ -86,6 +86,7 @@ Thumbs.db
 # Test data and session files
 *.jsonl
 !example*.jsonl  # Keep example files if any
+!tests/fixtures/example*.jsonl
 
 # Old/backup directories
 backup_*/

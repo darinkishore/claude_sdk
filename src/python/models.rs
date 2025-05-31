@@ -440,3 +440,81 @@ impl ToolUseBlock {
         }
     }
 }
+
+/// A thinking block in a message
+#[pyclass(name = "ThinkingBlock", module = "claude_sdk")]
+#[derive(Clone)]
+pub struct ThinkingBlock {
+    #[pyo3(get)]
+    pub thinking: String,
+    #[pyo3(get)]
+    pub signature: String,
+}
+
+#[pymethods]
+impl ThinkingBlock {
+    fn __repr__(&self) -> String {
+        format!("<ThinkingBlock thinking='{}'>", self.thinking)
+    }
+}
+
+/// An image block in a message
+#[pyclass(name = "ImageBlock", module = "claude_sdk")]
+#[derive(Clone)]
+pub struct ImageBlock {
+    #[pyo3(get)]
+    pub source_type: String,
+    #[pyo3(get)]
+    pub media_type: String,
+    #[pyo3(get)]
+    pub data: String,
+}
+
+#[pymethods]
+impl ImageBlock {
+    fn __repr__(&self) -> String {
+        format!("<ImageBlock media_type='{}'>", self.media_type)
+    }
+}
+
+/// A tool result block in a message
+#[pyclass(name = "ToolResultBlock", module = "claude_sdk")]
+#[derive(Clone)]
+pub struct ToolResultBlock {
+    #[pyo3(get)]
+    pub tool_use_id: String,
+    #[pyo3(get)]
+    pub content: Option<String>,
+    #[pyo3(get)]
+    pub is_error: Option<bool>,
+}
+
+#[pymethods]
+impl ToolResultBlock {
+    fn __repr__(&self) -> String {
+        format!("<ToolResultBlock id='{}' error={:?}>", self.tool_use_id, self.is_error)
+    }
+}
+
+/// Token usage statistics for a message
+#[pyclass(name = "TokenUsage", module = "claude_sdk")]
+#[derive(Clone)]
+pub struct TokenUsage {
+    #[pyo3(get)]
+    pub input_tokens: u32,
+    #[pyo3(get)]
+    pub cache_creation_input_tokens: Option<u32>,
+    #[pyo3(get)]
+    pub cache_read_input_tokens: Option<u32>,
+    #[pyo3(get)]
+    pub output_tokens: u32,
+    #[pyo3(get)]
+    pub service_tier: Option<String>,
+}
+
+#[pymethods]
+impl TokenUsage {
+    fn __repr__(&self) -> String {
+        format!("<TokenUsage in={} out={}>", self.input_tokens, self.output_tokens)
+    }
+}
