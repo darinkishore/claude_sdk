@@ -29,6 +29,10 @@ try:
         ConversationTree,
         TextBlock,
         ToolUseBlock,
+        ThinkingBlock,
+        ImageBlock,
+        ToolResultBlock,
+        TokenUsage,
         # Exceptions
         ClaudeSDKError,
         ParseError,
@@ -121,6 +125,10 @@ __all__ = [
     "ConversationTree",
     "TextBlock",
     "ToolUseBlock",
+    "ThinkingBlock",
+    "ImageBlock",
+    "ToolResultBlock",
+    "TokenUsage",
     # Functions
     "load",
     "find_sessions",

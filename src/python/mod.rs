@@ -7,7 +7,7 @@ pub mod models;
 pub mod utils;
 
 use classes::{Message, Session, Project};
-use models::{SessionMetadata, ToolResult, ToolExecution, ConversationStats, ConversationNode, ConversationTree, TextBlock, ToolUseBlock};
+use models::{SessionMetadata, ToolResult, ToolExecution, ConversationStats, ConversationNode, ConversationTree, TextBlock, ToolUseBlock, ThinkingBlock, ImageBlock, ToolResultBlock, TokenUsage};
 use exceptions::register_exceptions;
 use functions::{load, find_sessions, find_projects, load_project};
 
@@ -26,6 +26,10 @@ pub fn register_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ConversationTree>()?;
     m.add_class::<TextBlock>()?;
     m.add_class::<ToolUseBlock>()?;
+    m.add_class::<ThinkingBlock>()?;
+    m.add_class::<ImageBlock>()?;
+    m.add_class::<ToolResultBlock>()?;
+    m.add_class::<TokenUsage>()?;
     
     // Add exceptions
     register_exceptions(m)?;
