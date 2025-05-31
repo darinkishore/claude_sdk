@@ -16,3 +16,8 @@ binding = "pyo3"
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
