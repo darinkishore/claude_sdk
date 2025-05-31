@@ -1,13 +1,14 @@
 
-# Byte-compiled / optimized / DLL files
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Python
 __pycache__/
 *.py[cod]
-*.class
-
-# C extensions
+*$py.class
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -24,61 +25,137 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
-# PyInstaller
+MANIFEST
 *.manifest
 *.spec
-
-# Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+.env
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pytest
+.pytest_cache/
+.coverage
 htmlcov/
 .tox/
-.coverage
-.coverage.*
+.nox/
 .cache
 nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
 
-# Translations
-*.mo
-*.pot
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# Django stuff:
+# Pyre
+.pyre/
+
+# pytype
+.pytype/
+
+# Cython
+cython_debug/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Editor backups
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+
+# Logs
 *.log
-local_settings.py
+logs/
 
-# Flask stuff:
-instance/
-.webassets-cache
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
-# Scrapy stuff:
-.scrapy
+# Environment variables
+.env
+.env.local
+.env.*.local
 
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
+# Python specific
+*.pyo
+*.pyd
+.Python
+pip-selfcheck.json
 .python-version
 
-# celery beat schedule file
-celerybeat-schedule
+# Rust specific
+debug/
+*.rs.bk
+*.rustfmt
 
-# SageMath parsed files
+# Documentation
+docs/_build/
+site/
+
+# Testing
+.coverage.*
+.mutmut-cache
+.benchmarks/
+
+# Poetry
+poetry.lock
+
+# PDM
+.pdm.toml
+__pypackages__/
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath
 *.sage.py
 
 # Environments
@@ -90,20 +167,38 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
+# Rope
+.ropeproject
+
+# mkdocs
+/site
+
+# Spyder
 .spyderproject
 .spyproject
 
-# Rope project settings
-.ropeproject
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
 
-# mkdocs documentation
-/site
+# Archives
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.rar
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Secrets
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
 
 # Rust
 /target/
