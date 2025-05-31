@@ -1,5 +1,16 @@
 use pyo3::prelude::*;
 use crate::types::{ContentBlock, MessageRecord as RustMessageRecord, ParsedSession as RustParsedSession};
+use crate::python::models::{TextBlock, ToolUseBlock, ThinkingBlock, ImageBlock, ToolResultBlock};
+
+fn content_block_to_py(py: Python<'_>, block: &ContentBlock) -> PyObject {
+    match block {
+        ContentBlock::Text { text } => Py::new(py, TextBlock { text: text.clone() }).unwrap().into_py(py),
+        ContentBlock::Thinking { thinking, signature } => Py::new(py, ThinkingBlock { thinking: thinking.clone(), signature: signature.clone() }).unwrap().into_py(py),
+        ContentBlock::ToolUse { id, name, input } => Py::new(py, ToolUseBlock::from_content_block(id.clone(), name.clone(), input.clone())).unwrap().into_py(py),
+        ContentBlock::ToolResult { tool_use_id, content, is_error } => Py::new(py, ToolResultBlock { tool_use_id: tool_use_id.clone(), content: content.as_ref().map(|c| c.as_text()), is_error: *is_error }).unwrap().into_py(py),
+        ContentBlock::Image { source } => Py::new(py, ImageBlock { source_type: source.source_type.clone(), media_type: source.media_type.clone(), data: source.data.clone() }).unwrap().into_py(py),
+    }
+}
 use std::collections::HashMap;
 
 /// Individual message in a Claude Code conversation.
@@ -33,9 +44,15 @@ pub struct Message {
     #[pyo3(get)]
     pub text: String,
     #[pyo3(get)]
+    pub model: Option<String>,
+    #[pyo3(get)]
     pub cost: Option<f64>,
     #[pyo3(get)]
     pub tools: Vec<String>,
+    #[pyo3(get)]
+    pub stop_reason: Option<String>,
+    #[pyo3(get)]
+    pub usage: Option<crate::python::models::TokenUsage>,
     #[pyo3(get)]
     pub timestamp: String,
     #[pyo3(get)]
@@ -78,6 +95,14 @@ impl Message {
         }
         blocks
     }
+
+    /// Get all content blocks with proper typing.
+    fn get_content_blocks(&self, py: Python<'_>) -> Vec<PyObject> {
+        self.content_blocks
+            .iter()
+            .map(|b| content_block_to_py(py, b))
+            .collect()
+    }
 }
 
 impl Message {
@@ -103,8 +128,23 @@ impl Message {
         Message {
             role,
             text: text_parts.join("\n"),
+            model: msg.message.model.clone(),
             cost: Some(msg.cost()),
             tools,
+            stop_reason: msg.message.stop_reason.as_ref().map(|s| match s {
+                crate::types::StopReason::EndTurn => "end_turn".to_string(),
+                crate::types::StopReason::MaxTokens => "max_tokens".to_string(),
+                crate::types::StopReason::StopSequence => "stop_sequence".to_string(),
+                crate::types::StopReason::ToolUse => "tool_use".to_string(),
+                crate::types::StopReason::Error => "error".to_string(),
+            }),
+            usage: msg.message.usage.as_ref().map(|u| crate::python::models::TokenUsage{
+                input_tokens: u.input_tokens,
+                cache_creation_input_tokens: u.cache_creation_input_tokens,
+                cache_read_input_tokens: u.cache_read_input_tokens,
+                output_tokens: u.output_tokens,
+                service_tier: u.service_tier.clone(),
+            }),
             timestamp: msg.timestamp.to_rfc3339(),
             uuid: msg.uuid.to_string(),
             parent_uuid: msg.parent_uuid.as_ref().map(|u| u.to_string()),
