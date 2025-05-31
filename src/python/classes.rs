@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 use crate::types::{ContentBlock, MessageRecord as RustMessageRecord, ParsedSession as RustParsedSession, TokenUsage};
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Individual message in a Claude Code conversation.
 /// 
@@ -846,8 +847,9 @@ impl Project {
         for item in sessions_list.iter() {
             let session: Bound<'_, Session> = item.extract()?;
             for msg in &session.borrow().messages {
+                let msg_obj = Py::new(py, msg.clone())?;
                 messages_with_time.push((
-                    Py::new(py, msg.clone())?.into(),
+                    msg_obj.into_py(py),
                     msg.timestamp.clone()
                 ));
             }
@@ -896,15 +898,16 @@ impl Project {
             let session_ref = session.borrow();
             
             // Check if session overlaps with date range
-            if let (Some(start_time), Some(end_time)) = (session_ref.start_time(py)?, session_ref.end_time(py)?) {
-                if !start_time.is_none() && !end_time.is_none() {
-                    let session_start = start_time.call_method0(py, "isoformat")?.extract::<String>(py)?;
-                    let session_end = end_time.call_method0(py, "isoformat")?.extract::<String>(py)?;
-                    
-                    // Check if session overlaps with the range
-                    if session_start <= end_str && session_end >= start_str {
-                        filtered.append(item)?;
-                    }
+            let start_time = session_ref.start_time(py)?;
+            let end_time = session_ref.end_time(py)?;
+            
+            if !start_time.is_none(py) && !end_time.is_none(py) {
+                let session_start = start_time.call_method0(py, "isoformat")?.extract::<String>(py)?;
+                let session_end = end_time.call_method0(py, "isoformat")?.extract::<String>(py)?;
+                
+                // Check if session overlaps with the range
+                if session_start <= end_str && session_end >= start_str {
+                    filtered.append(item)?;
                 }
             }
         }
@@ -1021,7 +1024,7 @@ impl Project {
     
     fn __iter__(&self, py: Python<'_>) -> PyResult<PyObject> {
         // Return an iterator over sessions
-        self.sessions_py.bind(py).call_method0("__iter__")
+        Ok(self.sessions_py.bind(py).call_method0("__iter__")?.into())
     }
 }
 
@@ -1055,10 +1058,10 @@ impl Project {
         })
     }
     
-    pub fn from_rust_project(py: Python<'_>, project: crate::types::Project) -> PyResult<Self> {
-        // Convert Rust sessions to Python sessions
-        let sessions: Vec<Session> = project.sessions.iter()
-            .map(|s| Session::from_rust_session(s.clone()))
+    pub fn from_rust_project(py: Python<'_>, mut project: crate::types::Project) -> PyResult<Self> {
+        // Convert Rust sessions to Python sessions by taking ownership
+        let sessions: Vec<Session> = project.sessions.drain(..)
+            .map(Session::from_rust_session)
             .collect();
         
         let name = project.name.clone();
