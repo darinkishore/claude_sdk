@@ -1,14 +1,16 @@
-
 # Rust
 /target/
-**/*.rs.bk
-*.pdb
+Cargo.lock
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.pyi
+py.typed
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,139 +28,12 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# PyInstaller
 *.manifest
 *.spec
-pip-log.txt
-pip-delete-this-directory.txt
 
-# Virtual Environments
-venv/
-ENV/
-env/
-.venv
-.env
-
-# PyCharm
-.idea/
-
-# VS Code
-.vscode/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# pytest
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre
-.pyre/
-
-# pytype
-.pytype/
-
-# Cython
-cython_debug/
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msm
-*.msp
-*.lnk
-
-# Linux
-*~
-.fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# Editor backups
-*.swp
-*.swo
-*.swn
-*.bak
-*.tmp
-*.temp
-
-# Logs
-*.log
-logs/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# Python specific
-*.pyo
-*.pyd
-.Python
-pip-selfcheck.json
-.python-version
-
-# Rust specific
-debug/
-*.rs.bk
-*.rustfmt
-
-# Documentation
-docs/_build/
-site/
-
-# Testing
-.coverage.*
-.mutmut-cache
-.benchmarks/
-
-# Poetry
-poetry.lock
-
-# PDM
-.pdm.toml
-__pypackages__/
-
-# PEP 582
-__pypackages__/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath
-*.sage.py
-
-# Environments
+# Python environments
 .env
 .venv
 env/
@@ -166,69 +41,62 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
-# Rope
-.ropeproject
+# UV package manager
+uv.lock
 
-# mkdocs
-/site
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# Spyder
-.spyderproject
-.spyproject
+# IPython
+profile_default/
+ipython_config.py
 
-# Temporary files
-tmp/
-temp/
-*.tmp
-*.temp
-*.bak
-*.backup
-*.old
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Archives
-*.tar
-*.tar.gz
-*.zip
-*.7z
-*.rar
-
-# Secrets
-*.pem
-*.key
-*.cert
-*.crt
-secrets/
-
-# Rust
-/target/
-**/*.rs.bk
-Cargo.lock
-
-# Python extension build artifacts
-*.so
-*.pyd
-*.dll
-
-# Maturin build artifacts
-/python/claude_sdk/_core.*.so
-/python/claude_sdk/_core.*.pyd
-/python/.venv/
-
-# Distribution files
-/python/dist/
-/python/build/
-/python/*.egg-info/
-/python/.eggs/
-
-# IDE
+# IDEs and editors
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+.project
+.settings/
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.orig
+
+# Test data and session files
+*.jsonl
+!example*.jsonl  # Keep example files if any
+
+# Old/backup directories
+old_*/
+backup_*/
+*_old/
+*_backup/
+
+# Development artifacts
+.claude/
+*.debug
+core.*
+
+# Maturin build cache
+.cargo/

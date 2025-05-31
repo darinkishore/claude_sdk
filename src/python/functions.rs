@@ -246,19 +246,5 @@ pub fn load_project(project_identifier: &str, base_path: Option<&str>) -> PyResu
     }
     
     // Create and return the Project
-    Python::with_gil(|py| {
-        // Create a Rust project for inner reference
-        let rust_sessions = sessions.iter().map(|s| s.inner.clone()).collect();
-        let rust_project = crate::types::Project {
-            project_id: project_path.file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("unknown")
-                .to_string(),
-            project_path: project_path.clone(),
-            name: project_name.clone(),
-            sessions: rust_sessions,
-        };
-        
-        Project::from_rust_project(py, rust_project)
-    })
+    Python::with_gil(|py| Project::new(py, project_name, sessions))
 }

@@ -1,7 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use serde_json::Value;
-use chrono::{DateTime, Utc};
 
 /// Convert a serde_json::Value to a Python object
 pub fn json_to_py(py: Python<'_>, value: &Value) -> PyResult<PyObject> {
@@ -35,11 +34,4 @@ pub fn json_to_py(py: Python<'_>, value: &Value) -> PyResult<PyObject> {
             Ok(dict.into())
         }
     }
-}
-
-/// Convert a chrono DateTime to a Python datetime object
-pub fn datetime_to_py(py: Python<'_>, dt: DateTime<Utc>) -> PyResult<PyObject> {
-    // PyO3 datetime support requires chrono-tz feature or manual conversion
-    // For now, return the ISO string representation
-    Ok(dt.to_rfc3339().to_object(py))
 }

@@ -4,29 +4,42 @@
 //! Provides efficient access to Claude Code's JSONL format with conversation
 //! threading, tool usage extraction, and performance metrics.
 
-pub mod types;
-pub mod parser;
 pub mod conversation;
 pub mod error;
+pub mod parser;
+pub mod types;
 pub mod utils;
 
 // Re-export main types for convenience
 pub use types::{
-    // Message types
-    MessageRecord, Message, TokenUsage,
     // Content types
-    ContentBlock, ToolResultContent, ImageSource,
+    ContentBlock,
+    ImageSource,
+    Message,
+    // Message types
+    MessageRecord,
+    MessageType,
+    OutputFormat,
+    ParsedSession,
     // Enums
-    Role, MessageType, UserType, StopReason, OutputFormat,
+    Role,
+    SessionConfig,
     // Session types
-    SessionId, SessionConfig, SessionMetadata, ParsedSession, SummaryRecord,
+    SessionId,
+    SessionMetadata,
+    StopReason,
+    SummaryRecord,
+    TokenUsage,
+    ToolExecution,
     // Tool types
-    ToolResult, ToolExecution,
+    ToolResult,
+    ToolResultContent,
+    UserType,
 };
 
+pub use conversation::{ConversationNode, ConversationTree};
+pub use error::{ClaudeError, ExecutionError, ParseError};
 pub use parser::SessionParser;
-pub use conversation::{ConversationTree, ConversationNode};
-pub use error::{ClaudeError, ParseError, ExecutionError};
 
 /// Result type alias for the library
 pub type Result<T> = std::result::Result<T, ClaudeError>;

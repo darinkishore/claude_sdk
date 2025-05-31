@@ -66,6 +66,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "claude-sdk"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "crossbeam",
+ "dirs",
+ "pyo3",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.12",
+ "uuid",
+]
+
+[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -405,21 +420,6 @@ dependencies = [
  "getrandom 0.2.16",
  "libredox",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "rust_sdk"
-version = "0.2.0"
-dependencies = [
- "chrono",
- "crossbeam",
- "dirs",
- "pyo3",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.12",
- "uuid",
 ]
 
 [[package]]
