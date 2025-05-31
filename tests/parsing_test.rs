@@ -1,4 +1,4 @@
-use rust_sdk::{SessionParser, MessageRecord, ContentBlock, Role};
+use claude_sdk::{SessionParser, MessageRecord, ContentBlock, Role};
 use std::io::Write;
 use tempfile::NamedTempFile;
 
@@ -83,7 +83,7 @@ fn test_parse_empty_file() {
     let parser = SessionParser::new(temp_file.path());
     
     match parser.parse() {
-        Err(rust_sdk::ClaudeError::ParseError(rust_sdk::ParseError::EmptyFile)) => {
+        Err(claude_sdk::ClaudeError::ParseError(claude_sdk::ParseError::EmptyFile)) => {
             // Expected error
         }
         _ => panic!("Expected EmptyFile error"),
