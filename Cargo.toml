@@ -1,12 +1,16 @@
 [package]
 name = "rust_sdk"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+authors = ["Darin Kishore <darinkishore@protonmail.com>"]
+description = "High-performance Claude Code SDK core with Python bindings"
+license = "MIT"
+repository = "https://github.com/darinkishore/claude-sdk-rust"
 exclude = ["python/"]
 
 [lib]
 name = "rust_sdk"
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [features]
 default = []

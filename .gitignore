@@ -105,3 +105,35 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Python extension build artifacts
+*.so
+*.pyd
+*.dll
+
+# Maturin build artifacts
+/python/claude_sdk/_core.*.so
+/python/claude_sdk/_core.*.pyd
+/python/.venv/
+
+# Distribution files
+/python/dist/
+/python/build/
+/python/*.egg-info/
+/python/.eggs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
