@@ -91,7 +91,6 @@ class TestCurrentMethods:
 class TestEnhancedMethods:
     """Test methods that should be added from the dirty branch"""
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_message_get_text_blocks(self):
         """Test get_text_blocks method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -103,7 +102,6 @@ class TestEnhancedMethods:
             assert hasattr(block, 'text')
             assert isinstance(block.text, str)
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_message_has_tool_use(self):
         """Test has_tool_use method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -123,7 +121,6 @@ class TestEnhancedMethods:
         # Make sure we tested both cases
         assert has_tools and no_tools
     
-    @pytest.mark.skip(reason="Properties not yet implemented")
     def test_message_token_properties(self):
         """Test token usage properties"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -139,7 +136,6 @@ class TestEnhancedMethods:
                 assert hasattr(msg, 'model')
                 break
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_get_messages_by_tool(self):
         """Test get_messages_by_tool method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -153,7 +149,6 @@ class TestEnhancedMethods:
             for msg in tool_messages:
                 assert tool_name in msg.tools
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_get_message_by_uuid(self):
         """Test get_message_by_uuid method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -169,7 +164,6 @@ class TestEnhancedMethods:
         not_found = session.get_message_by_uuid("non-existent-uuid")
         assert not_found is None
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_filter_messages(self):
         """Test filter_messages method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -182,7 +176,6 @@ class TestEnhancedMethods:
         costly_msgs = session.filter_messages(lambda m: m.cost and m.cost > 0)
         assert all(m.cost and m.cost > 0 for m in costly_msgs)
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_get_thread(self):
         """Test get_thread method"""
         session = claude_sdk.load(FIXTURE_PATH)
@@ -235,7 +228,6 @@ class TestEnhancedMethods:
         if session_dict['messages']:
             assert isinstance(session_dict['messages'][0], dict)
     
-    @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_iteration(self):
         """Test __len__ and __iter__ methods"""
         session = claude_sdk.load(FIXTURE_PATH)

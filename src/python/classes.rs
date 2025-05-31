@@ -63,6 +63,12 @@ pub struct Message {
     pub is_sidechain: bool,
     #[pyo3(get)]
     pub cwd: String,
+    #[pyo3(get)]
+    pub total_tokens: Option<u32>,
+    #[pyo3(get)]
+    pub input_tokens: Option<u32>,
+    #[pyo3(get)]
+    pub output_tokens: Option<u32>,
     // Store the raw content for get_tool_blocks
     content_blocks: Vec<ContentBlock>,
 }
@@ -103,6 +109,30 @@ impl Message {
             .map(|b| content_block_to_py(py, b))
             .collect()
     }
+    
+    /// Get all text content blocks in this message.
+    /// 
+    /// Returns:
+    ///     List[TextBlock]: List of text content blocks
+    fn get_text_blocks(&self) -> Vec<crate::python::models::TextBlock> {
+        let mut blocks = Vec::new();
+        for content in &self.content_blocks {
+            if let ContentBlock::Text { text } = content {
+                blocks.push(crate::python::models::TextBlock {
+                    text: text.clone(),
+                });
+            }
+        }
+        blocks
+    }
+    
+    /// Check if this message contains tool usage.
+    /// 
+    /// Returns:
+    ///     bool: True if message contains any tool use blocks
+    fn has_tool_use(&self) -> bool {
+        !self.tools.is_empty()
+    }
 }
 
 impl Message {
@@ -124,6 +154,17 @@ impl Message {
                 _ => {}
             }
         }
+        
+        // Extract token information
+        let (total_tokens, input_tokens, output_tokens) = if let Some(usage) = &msg.message.usage {
+            (
+                Some(usage.input_tokens + usage.output_tokens),
+                Some(usage.input_tokens),
+                Some(usage.output_tokens),
+            )
+        } else {
+            (None, None, None)
+        };
         
         Message {
             role,
@@ -150,7 +191,34 @@ impl Message {
             parent_uuid: msg.parent_uuid.as_ref().map(|u| u.to_string()),
             is_sidechain: msg.is_sidechain,
             cwd: msg.cwd.to_string_lossy().to_string(),
+            total_tokens,
+            input_tokens,
+            output_tokens,
             content_blocks: msg.message.content.clone(),
+        }
+    }
+}
+
+/// Iterator for messages in a session
+#[pyclass(name = "MessageIterator", module = "claude_sdk")]
+struct MessageIterator {
+    messages: Vec<Message>,
+    index: usize,
+}
+
+#[pymethods]
+impl MessageIterator {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+    
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<Message> {
+        if slf.index < slf.messages.len() {
+            let msg = slf.messages[slf.index].clone();
+            slf.index += 1;
+            Some(msg)
+        } else {
+            None
         }
     }
 }
@@ -280,6 +348,90 @@ impl Session {
             .filter(|msg| msg.role == role)
             .cloned()
             .collect()
+    }
+    
+    /// Get messages that used a specific tool.
+    /// 
+    /// Args:
+    ///     tool_name: Name of the tool to filter by
+    /// 
+    /// Returns:
+    ///     List[Message]: Messages that used the specified tool
+    fn get_messages_by_tool(&self, tool_name: &str) -> Vec<Message> {
+        self.messages.iter()
+            .filter(|msg| msg.tools.contains(&tool_name.to_string()))
+            .cloned()
+            .collect()
+    }
+    
+    /// Get a message by its UUID.
+    /// 
+    /// Args:
+    ///     uuid: UUID string of the message
+    /// 
+    /// Returns:
+    ///     Optional[Message]: The message if found, None otherwise
+    fn get_message_by_uuid(&self, uuid: &str) -> Option<Message> {
+        self.messages.iter()
+            .find(|msg| msg.uuid == uuid)
+            .cloned()
+    }
+    
+    /// Filter messages with a custom predicate function.
+    /// 
+    /// Args:
+    ///     predicate: A callable that takes a Message and returns bool
+    /// 
+    /// Returns:
+    ///     List[Message]: Messages that match the predicate
+    fn filter_messages(&self, predicate: &Bound<'_, PyAny>) -> PyResult<Vec<Message>> {
+        let mut filtered = Vec::new();
+        for msg in &self.messages {
+            let result = predicate.call1((msg.clone(),))?;
+            if result.is_truthy()? {
+                filtered.push(msg.clone());
+            }
+        }
+        Ok(filtered)
+    }
+    
+    /// Get all messages in a thread from root to specified message.
+    /// 
+    /// Args:
+    ///     message_uuid: UUID of the target message
+    /// 
+    /// Returns:
+    ///     List[Message]: Messages in the thread from root to target
+    fn get_thread(&self, message_uuid: &str) -> Vec<Message> {
+        let mut current_uuid = Some(message_uuid.to_string());
+        let uuid_to_msg: std::collections::HashMap<String, &Message> = self.messages.iter()
+            .map(|msg| (msg.uuid.clone(), msg))
+            .collect();
+        
+        let mut path = Vec::new();
+        while let Some(uuid) = current_uuid {
+            if let Some(msg) = uuid_to_msg.get(&uuid) {
+                path.push((*msg).clone());
+                current_uuid = msg.parent_uuid.clone();
+            } else {
+                break;
+            }
+        }
+        
+        path.reverse();
+        path
+    }
+    
+    fn __len__(&self) -> usize {
+        self.messages.len()
+    }
+    
+    fn __iter__(slf: PyRef<'_, Self>) -> PyResult<Py<MessageIterator>> {
+        let iter = MessageIterator {
+            messages: slf.messages.clone(),
+            index: 0,
+        };
+        Py::new(slf.py(), iter)
     }
     
     fn __repr__(&self) -> String {
