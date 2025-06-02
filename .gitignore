@@ -97,6 +97,7 @@ backup_*/
 .claude/
 *.debug
 core.*
+test-env/
 
 # Maturin build cache
 .cargo/
