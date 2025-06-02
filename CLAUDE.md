@@ -243,4 +243,9 @@ pip list | grep claude
 # Reinstall if needed
 pip uninstall claude-sdk
 cd python && maturin develop
-``` 
+```
+
+## Development Memories
+
+- ALWAYS use uv run before typing python. it sets up the environment properly. Use `uv add` to add packages. 
+- Use uv build to build the project. 

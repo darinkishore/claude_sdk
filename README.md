@@ -33,11 +33,8 @@ pip install claude-sdk
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/claude-sdk.git
+git clone https://github.com/darinkishore/claude-sdk.git
 cd claude-sdk
-
-# Install using pip
-pip install ./python
 
 # Or using uv (recommended)
 uv pip install ./python
