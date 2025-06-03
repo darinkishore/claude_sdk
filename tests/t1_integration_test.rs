@@ -95,9 +95,10 @@ mod executor_integration_tests {
         let execution2 = executor.execute(prompt2)
             .expect("Failed to execute continuation prompt");
         
-        // Verify it's the same session
-        assert_eq!(execution2.session_id, session_id1, 
-            "Session ID should remain the same when continuing");
+        // Note: Claude creates a new session ID for each execution, even with --continue
+        // The session_id will be different, but the conversation context is maintained
+        assert_ne!(execution2.session_id, session_id1, 
+            "Session ID should be different even when continuing");
         
         // Verify the file was updated
         let hello_file = workspace.join("hello.py");
