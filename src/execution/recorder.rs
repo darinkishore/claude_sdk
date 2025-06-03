@@ -181,14 +181,23 @@ impl TransitionRecorder {
     pub fn recent(&self, limit: Option<usize>) -> Result<Vec<Transition>, RecorderError> {
         let mut transitions = Vec::new();
         
-        // Read current session file
-        if self.current_session_file.exists() {
-            let content = std::fs::read_to_string(&self.current_session_file)
-                .map_err(|e| RecorderError::StorageError(e.to_string()))?;
-                
-            for line in content.lines() {
-                if let Ok(transition) = serde_json::from_str::<Transition>(line) {
-                    transitions.push(transition);
+        // Read all session log files
+        for entry in std::fs::read_dir(&self.storage_dir)
+            .map_err(|e| RecorderError::StorageError(e.to_string()))?
+        {
+            let path = match entry {
+                Ok(e) => e.path(),
+                Err(e) => return Err(RecorderError::StorageError(e.to_string())),
+            };
+
+            if path.extension().map(|e| e == "jsonl").unwrap_or(false) {
+                let content = std::fs::read_to_string(&path)
+                    .map_err(|e| RecorderError::StorageError(e.to_string()))?;
+
+                for line in content.lines() {
+                    if let Ok(transition) = serde_json::from_str::<Transition>(line) {
+                        transitions.push(transition);
+                    }
                 }
             }
         }
