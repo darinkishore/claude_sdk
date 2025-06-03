@@ -32,13 +32,21 @@ impl ToolResult {
     
     /// Get the effective output content
     pub fn effective_content(&self) -> &str {
-        if self.is_error && !self.stderr.as_ref().unwrap_or(&String::new()).is_empty() {
-            self.stderr.as_ref().unwrap()
-        } else if !self.stdout.as_ref().unwrap_or(&String::new()).is_empty() {
-            self.stdout.as_ref().unwrap()
-        } else {
-            &self.content
+        if self.is_error {
+            if let Some(stderr) = &self.stderr {
+                if !stderr.is_empty() {
+                    return stderr;
+                }
+            }
         }
+
+        if let Some(stdout) = &self.stdout {
+            if !stdout.is_empty() {
+                return stdout;
+            }
+        }
+
+        &self.content
     }
 }
 

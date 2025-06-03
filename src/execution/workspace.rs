@@ -23,6 +23,10 @@ pub struct Workspace {
 impl Workspace {
     /// Create a new workspace at the given path
     pub fn new(workspace_path: PathBuf) -> Result<Self, WorkspaceError> {
+        // Ensure the workspace directory exists so subsequent operations succeed
+        std::fs::create_dir_all(&workspace_path)
+            .map_err(|e| WorkspaceError::ObserverError(ObserverError::IoError(e.to_string())))?;
+
         let executor = ClaudeExecutor::new(workspace_path.clone())?;
         let observer = EnvironmentObserver::new(workspace_path.clone());
         
