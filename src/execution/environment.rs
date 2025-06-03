@@ -27,11 +27,22 @@ impl ClaudeEnvironment {
         })
     }
     
+    /// Start a new session with the given prompt
+    pub fn start(&mut self, prompt: &str) -> Result<Transition, EnvironmentError> {
+        self.execute_with_options(prompt, false)
+    }
+    
+    /// Continue the current session with the given prompt
+    pub fn continue_session(&mut self, prompt: &str) -> Result<Transition, EnvironmentError> {
+        self.execute_with_options(prompt, true)
+    }
+    
+    /// Execute with explicit options (legacy method, prefer start/continue)
     pub fn execute(&mut self, prompt: &str) -> Result<Transition, EnvironmentError> {
         self.execute_with_options(prompt, false)
     }
     
-    pub fn execute_with_options(
+    fn execute_with_options(
         &mut self, 
         prompt: &str, 
         continue_session: bool
