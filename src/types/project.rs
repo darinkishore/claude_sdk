@@ -3,7 +3,6 @@ use chrono::{DateTime, Utc, Duration};
 use std::collections::HashMap;
 
 use super::session::ParsedSession;
-use crate::utils::path::{decode_project_path, extract_project_name};
 use crate::parser::SessionParser;
 use crate::error::ClaudeError;
 
@@ -12,9 +11,9 @@ use crate::error::ClaudeError;
 pub struct Project {
     /// Encoded directory name (e.g., "-Users-darin-Projects-apply-model")
     pub project_id: String,
-    /// Decoded filesystem path (e.g., "/Users/darin/Projects/apply-model")
-    pub project_path: PathBuf,
-    /// Display name for the project (e.g., "apply-model")
+    /// Claude project directory path
+    pub claude_project_dir: PathBuf,
+    /// Display name for the project (just the encoded ID for now)
     pub name: String,
     /// Sessions belonging to this project
     pub sessions: Vec<ParsedSession>,
@@ -104,14 +103,13 @@ impl Project {
             }))?
             .to_string();
         
-        // Decode to get the original project path
-        let project_path = decode_project_path(&project_id);
-        let name = extract_project_name(&project_path);
+        // Use the encoded ID as the display name for now
+        let name = project_id.clone();
         
         // Create project without sessions first
         let mut project = Self {
             project_id,
-            project_path,
+            claude_project_dir: project_dir.to_path_buf(),
             name,
             sessions: Vec::new(),
         };

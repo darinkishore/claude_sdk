@@ -1,0 +1,122 @@
+{
+  "generated_at": "2025-06-01T20:32:49.385844",
+  "year": 2025,
+  "headline_stats": {
+    "total_cost": 1042.12889005,
+    "cost_comparison": "a nice laptop \ud83d\udcbb",
+    "coffee_equivalent": "232 coffees",
+    "total_sessions": 365,
+    "total_messages": 57596,
+    "total_tokens": 10548102
+  },
+  "collaboration_stats": {
+    "total_exchanges": 57596,
+    "your_messages": 31481,
+    "claude_messages": 26115,
+    "ideas_explored": 5424,
+    "problems_solved": 314,
+    "words_written": 3620919,
+    "pages_written": 14483
+  },
+  "time_personality": {
+    "type": "The Midnight Maestro \ud83c\udf19",
+    "description": "Creating magic while the world sleeps!"
+  },
+  "usage_personality": {
+    "type": "The Deep Space Explorer \ud83d\ude80",
+    "description": "No rabbit hole too deep, no problem too complex"
+  },
+  "peak_month": {
+    "month": "May 2025",
+    "cost": 995.6767411000002,
+    "sessions": 353
+  },
+  "tool_mastery": {
+    "favorite_tool": "Bash",
+    "signature_combo": [
+      "Bash",
+      "Edit",
+      "Glob",
+      "Grep",
+      "LS"
+    ],
+    "tool_diversity_score": 64
+  },
+  "memorable_moments": {
+    "most_expensive_message": {
+      "cost": 2.159658,
+      "preview": "You're right! Let me make it panic and show us which file is causing the issue:"
+    },
+    "longest_session": {
+      "duration_hours": 70.86805555555556,
+      "messages": 341
+    },
+    "deepest_conversation": {
+      "depth": 458
+    },
+    "most_branches": {
+      "count": 814
+    }
+  },
+  "conversation_highlights": {
+    "longest_message": {
+      "length": 126126,
+      "preview": "there's also document everything and letting agent have its own environment. could even be fhsuser and we could give it root so we don't see failed commands and it has maximum autonomy. and it works t...",
+      "role": "user"
+    },
+    "most_tools_in_message": {
+      "count": 9,
+      "tools": [
+        "Task",
+        "Task",
+        "Task",
+        "Task",
+        "Task",
+        "Task",
+        "Task",
+        "Task",
+        "Task"
+      ]
+    },
+    "fastest_exchange": null,
+    "most_expensive_minute": null
+  },
+  "achievements": [
+    "\ud83d\udc8e Diamond Hands - Over $1,000 invested in AI excellence!",
+    "\ud83d\udcaf Century Club - 100+ sessions completed!",
+    "\ud83d\udcda Novelist - Over 100,000 words written together!",
+    "\ud83e\udde9 Problem Solver Pro - 50+ problems conquered!",
+    "\ud83d\udee0\ufe0f Master of All Trades - 15+ different tools mastered!",
+    "\ud83c\udf0d Round the Clock - Active in 20+ hours of the day!",
+    "\ud83c\udfca Mariana Trench Explorer - Average depth over 20 levels!"
+  ],
+  "predictions": [
+    "You're on track to invest $1563.1933 next year \ud83d\udcc8",
+    "At this pace, you'll have 365 more sessions next year",
+    "You'll likely master 3-5 new tools based on your learning curve \ud83d\udee0\ufe0f"
+  ],
+  "monthly_progression": {
+    "2025-04": {
+      "cost": 7.905511200000001,
+      "sessions": 5,
+      "messages": 586
+    },
+    "2025-05": {
+      "cost": 995.6767411000002,
+      "sessions": 353,
+      "messages": 56553
+    },
+    "2025-06": {
+      "cost": 38.54663774999999,
+      "sessions": 7,
+      "messages": 457
+    }
+  },
+  "fun_facts": [
+    "You invest $2.8551 per day in AI assistance",
+    "You and Claude have written 14483 pages together!",
+    "Your brain is most active at 21:00",
+    "You've generated 141 books worth of content!",
+    "You're in the top 10% of Claude users by session count!"
+  ]
+}

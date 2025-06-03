@@ -2,6 +2,27 @@
 
 A Rust library with Python bindings for parsing and analyzing Claude Code session data.
 
+## Architecture Components
+
+### T0 - Session Parser (Complete)
+- Parses JSONL files from Claude sessions
+- Extracts messages, tool uses, and metadata
+- Builds conversation trees
+
+### T1 - Execution Engine (Complete)
+- Programmatic control over Claude CLI
+- Records transitions (before/after snapshots)
+- Extracts tool executions from sessions
+- Key components:
+  - `ClaudeExecutor`: Wraps Claude CLI
+  - `EnvironmentObserver`: Monitors workspace state
+  - `TransitionRecorder`: Records state transitions
+  - `ClaudeEnvironment`: High-level interface
+
+### T2 - Orchestration Layer (TODO)
+- Higher-level patterns: ReAct, HTN, reactive programming
+- Built on top of T1 primitives
+
 ## Quick Start
 
 ### Development Setup
@@ -111,6 +132,10 @@ import claude_sdk
 session = claude_sdk.load('path/to/session.jsonl')
 print(f'Loaded session with {len(session.messages)} messages')
 "
+
+# Run T1 tests (requires Claude CLI)
+cargo test --test t1_simple_tool_test -- --ignored --nocapture
+cargo test --test t1_tool_extraction_test -- --ignored --nocapture
 ```
 
 ## Development Workflow
@@ -184,6 +209,7 @@ ls ../target/wheels/
 
 ## Available Python API
 
+### T0 - Session Parser
 ```python
 import claude_sdk
 
@@ -198,6 +224,29 @@ claude_sdk.Session       # Session data
 claude_sdk.Message       # Individual messages
 claude_sdk.Project       # Project with multiple sessions
 claude_sdk.ToolResult    # Tool execution results
+```
+
+### T1 - Execution Engine
+```python
+# High-level API
+agent = claude_sdk.ClaudeAgent("/path/to/project")
+response = agent.send("Build something")
+print(response.text, response.cost, response.files_modified)
+
+# Low-level API
+workspace = claude_sdk.Workspace("/path/to/project")
+conversation = claude_sdk.Conversation(workspace)
+transition = conversation.send("Do something")
+
+# Classes
+claude_sdk.ClaudeAgent      # High-level conversation interface
+claude_sdk.AgentResponse    # User-friendly response wrapper
+claude_sdk.Workspace        # Execution context
+claude_sdk.Conversation     # Manages transitions
+claude_sdk.Transition       # Before/after state + execution
+claude_sdk.ClaudePrompt     # Prompt configuration
+claude_sdk.ClaudeExecution  # Execution results
+claude_sdk.EnvironmentSnapshot  # Workspace state
 
 # Exceptions
 claude_sdk.ClaudeSDKError
@@ -246,4 +295,69 @@ uv build
 ## Development Memories
 
 - ALWAYS use uv run before typing python. it sets up the environment properly. Use `uv add` to add packages. 
-- Use uv build to build the project. 
+- Use uv build to build the project.
+
+## Important Claude CLI Integration Notes
+
+### Directory Requirements
+- **Claude CLI requires a proper project context** - It won't work in arbitrary temp directories
+- Claude creates project directories at `~/.claude/projects/` with encoded names
+- Path encoding: `/Users/name/.claude/rust_sdk` → `-Users-name--claude-rust-sdk`
+  - Slashes → hyphens
+  - Dots after slashes → double hyphens  
+  - **Underscores → hyphens** (important!)
+
+### Testing Execution
+- **DO NOT test in system temp directories** (`/tmp`, `/var/folders/...`)
+- Instead, test in:
+  - Subdirectories of existing projects: `/path/to/project/.claude-sdk-test/`
+  - User-owned directories: `~/test-claude-sdk/`
+- Claude needs to initialize the project directory on first use
+
+### Session File Timing
+- Claude writes session files immediately after execution (microseconds)
+- The `EnvironmentObserver` expects to find these files in `~/.claude/projects/[encoded-path]/`
+- If testing in a new directory, Claude may need to be run once manually to initialize
+
+### Workspace Constraints
+- `Workspace` is wrapped in `Arc<>` for thread safety, preventing runtime mutation
+- Settings like `skip_permissions` must be set at creation time (not yet exposed in Python)
+- Default configuration uses standard Claude tools (Task, Bash, Read, Edit, etc.)
+
+## T1 Implementation Notes
+
+### Key Discoveries
+
+1. **Session IDs**: Each Claude execution creates a new session ID, even when using `--continue`
+2. **JSONL Timing**: JSONL files are written immediately after execution (microseconds)
+3. **Path Encoding**: Claude projects use special encoding for hidden directories: `/.hidden` → `--hidden`
+4. **Command Order**: The `-p` flag must come immediately before the prompt text
+5. **Permissions**: Use `--dangerously-skip-permissions` by default for programmatic usage
+
+### Session Tracking
+
+When not continuing a session, the "before" state should be empty:
+```rust
+let before = if continue_session {
+    self.observer.snapshot()?  // Get most recent session
+} else {
+    EnvironmentSnapshot {
+        files: self.observer.snapshot()?.files,
+        session_file: PathBuf::new(),
+        timestamp: chrono::Utc::now(),
+        session: None,  // No session to compare against
+    }
+};
+```
+
+This ensures new messages are properly detected when comparing states.
+
+### TODO: API Improvements
+
+1. **Refactor ClaudePrompt**: The `continue_session` flag is redundant with `resume_session_id`. Should use only `resume_session_id` where:
+   - `None` = start new session
+   - `Some(id)` = continue specific session
+
+2. **Remove project name inference**: Remove any "smart" project name detection or path decoding. We should always work with explicit filesystem paths, never try to infer from Claude project names.
+
+3. **Fix integration tests**: Update test files to work with new API structure 

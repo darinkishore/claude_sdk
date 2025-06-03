@@ -33,6 +33,13 @@ try:
         ImageBlock,
         ToolResultBlock,
         TokenUsage,
+        # Execution Engine (T1)
+        Workspace,
+        Conversation,
+        Transition,
+        ClaudePrompt,
+        ClaudeExecution,
+        EnvironmentSnapshot,
         # Exceptions
         ClaudeSDKError,
         ParseError,
@@ -45,6 +52,9 @@ except ImportError as e:
     ) from e
 
 __version__ = "0.1.0"
+
+# Import high-level Python wrappers
+from .agent import ClaudeAgent, AgentResponse, ClaudeEnvironment
 
 # All classes are now imported from Rust
 
@@ -129,6 +139,17 @@ __all__ = [
     "ImageBlock",
     "ToolResultBlock",
     "TokenUsage",
+    # Execution Engine (T1) - Low Level
+    "Workspace",
+    "Conversation",
+    "Transition",
+    "ClaudePrompt",
+    "ClaudeExecution",
+    "EnvironmentSnapshot",
+    # High-Level Wrappers
+    "ClaudeAgent",
+    "AgentResponse",
+    "ClaudeEnvironment",
     # Functions
     "load",
     "find_sessions",
