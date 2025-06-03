@@ -12,11 +12,11 @@ fn test_tool_permissions() {
     let temp_dir = TempDir::new().unwrap();
     let workspace = temp_dir.path().to_path_buf();
     
-    // Test 1: Default behavior (currently --dangerously-skip-permissions)
-    println!("1. Testing default permissions...");
+    // Test 1: Default behavior (standard Claude Code tools)
+    println!("1. Testing default permissions (standard Claude Code tools)...");
     let executor = ClaudeExecutor::new(workspace.clone()).unwrap();
     let result = executor.execute(ClaudePrompt {
-        text: "Create a file test.txt".to_string(),
+        text: "Create a file test.txt with 'Hello World'".to_string(),
         continue_session: false,
         resume_session_id: None,
     });
@@ -75,6 +75,22 @@ fn test_tool_permissions() {
         Err(e) => println!("   ❌ Specific command execution failed: {}", e),
     }
     
+    // Test 5: Skip permissions mode (for backward compatibility/testing)
+    println!("\n5. Testing skip permissions mode...");
+    let mut executor5 = ClaudeExecutor::new(workspace.clone()).unwrap();
+    executor5.set_skip_permissions(true);
+    
+    let result5 = executor5.execute(ClaudePrompt {
+        text: "Create a file with skip permissions".to_string(),
+        continue_session: false,
+        resume_session_id: None,
+    });
+    
+    match result5 {
+        Ok(exec) => println!("   ✅ Skip permissions execution succeeded: {}", exec.response),
+        Err(e) => println!("   ❌ Skip permissions execution failed: {}", e),
+    }
+    
     println!("\n=== Tool Permissions Documentation ===");
     println!("Format examples:");
     println!("  - Allow specific tools: \"Read,Write,Edit\"");
@@ -82,8 +98,9 @@ fn test_tool_permissions() {
     println!("  - Allow specific Bash commands: \"Bash(npm install),Bash(npm test)\"");
     println!("  - Disallow specific tools: set_disallowed_tools(\"Bash,WebFetch\")");
     println!("\nCurrent behavior:");
-    println!("  - Default: --dangerously-skip-permissions (TODO: change this)");
+    println!("  - Default: Standard Claude Code tools (Task,Bash,Glob,Grep,LS,Read,Edit,MultiEdit,Write,etc.)");
     println!("  - With allowed_tools set: uses --allowedTools flag");
     println!("  - With disallowed_tools set: uses --disallowedTools flag");
     println!("  - With both set: both flags are passed to Claude");
+    println!("  - Skip permissions mode: uses --dangerously-skip-permissions (only for tests)");
 }

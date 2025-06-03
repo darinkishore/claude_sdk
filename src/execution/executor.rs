@@ -33,11 +33,15 @@ pub struct ClaudeExecution {
     pub timestamp: DateTime<Utc>,
 }
 
+/// Default tools that Claude Code has access to
+const DEFAULT_ALLOWED_TOOLS: &str = "Task,Bash,Glob,Grep,LS,Read,Edit,MultiEdit,Write,NotebookRead,NotebookEdit,WebFetch,TodoRead,TodoWrite,WebSearch";
+
 pub struct ClaudeExecutor {
     claude_binary: PathBuf,
     working_directory: PathBuf,
     allowed_tools: Option<String>,
     disallowed_tools: Option<String>,
+    skip_permissions: bool,
 }
 
 impl ClaudeExecutor {
@@ -51,6 +55,7 @@ impl ClaudeExecutor {
             working_directory,
             allowed_tools: None,
             disallowed_tools: None,
+            skip_permissions: false,  // Don't skip by default
         })
     }
     
@@ -62,6 +67,12 @@ impl ClaudeExecutor {
     /// Set disallowed tools (e.g., "Bash(rm -rf)" or "Write")
     pub fn set_disallowed_tools(&mut self, tools: Option<String>) {
         self.disallowed_tools = tools;
+    }
+    
+    /// Enable dangerous mode that skips all permission checks
+    /// This should only be used in tests or when explicitly requested
+    pub fn set_skip_permissions(&mut self, skip: bool) {
+        self.skip_permissions = skip;
     }
     
     pub fn execute(&self, prompt: ClaudePrompt) -> Result<ClaudeExecution, ExecutorError> {
@@ -81,8 +92,11 @@ impl ClaudeExecutor {
             cmd.arg("--continue");
         }
         
-        // Add tool permissions or skip them entirely
-        if self.allowed_tools.is_some() || self.disallowed_tools.is_some() {
+        // Handle tool permissions
+        if self.skip_permissions {
+            // Explicitly skip permissions (for tests)
+            cmd.arg("--dangerously-skip-permissions");
+        } else if self.allowed_tools.is_some() || self.disallowed_tools.is_some() {
             // Use explicit permissions if set
             if let Some(ref allowed) = self.allowed_tools {
                 cmd.arg("--allowedTools").arg(allowed);
@@ -91,8 +105,8 @@ impl ClaudeExecutor {
                 cmd.arg("--disallowedTools").arg(disallowed);
             }
         } else {
-            // Default: skip permissions entirely
-            cmd.arg("--dangerously-skip-permissions");
+            // Default: use standard Claude Code tools
+            cmd.arg("--allowedTools").arg(DEFAULT_ALLOWED_TOOLS);
         }
         
         // -p must come right before the prompt text
