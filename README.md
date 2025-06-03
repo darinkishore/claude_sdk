@@ -2,6 +2,17 @@
 
 A high-performance Python library for parsing and analyzing Claude Code session data. Built with Rust for speed, designed with Python developers in mind.
 
+## Features
+
+- **Session Parsing**: Load and analyze JSONL session files from Claude
+- **Message Threading**: Automatically construct conversation trees from messages
+- **Tool Execution Analysis**: Extract and analyze tool usage patterns
+- **Python Bindings**: Use from Python with a clean, Pythonic API
+- **Cost Tracking**: Monitor token usage and costs across sessions
+- **T1 Execution Engine**: Programmatic control over Claude CLI with transition recording
+
+For known limitations and caveats, see [LIMITATIONS.md](LIMITATIONS.md).
+
 ## Table of Contents
 
 - [Installation](#installation)

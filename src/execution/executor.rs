@@ -28,7 +28,6 @@ pub struct ClaudeExecution {
     pub session_id: String,
     pub cost: f64,
     pub duration_ms: u64,
-    pub tool_calls: Vec<String>,  // Tool names used
     pub model: String,
     pub timestamp: DateTime<Utc>,
 }
@@ -133,7 +132,6 @@ impl ClaudeExecutor {
             session_id: response.session_id.clone(),
             cost: response.cost_usd,
             duration_ms: start.elapsed().as_millis() as u64,
-            tool_calls: extract_tool_calls(&response),
             model: response.model.unwrap_or_else(|| "unknown".to_string()),
             timestamp: Utc::now(),
         })
@@ -157,11 +155,6 @@ struct ClaudeJsonResponse {
     duration_ms: u64,
 }
 
-fn extract_tool_calls(_response: &ClaudeJsonResponse) -> Vec<String> {
-    // Tool calls are now extracted from ParsedSession after execution
-    // This placeholder remains for backward compatibility
-    Vec::new()
-}
 
 #[derive(Debug, thiserror::Error)]
 pub enum ExecutorError {

@@ -93,7 +93,7 @@ impl Conversation {
         // Execute via workspace
         let execution = self.workspace.executor.execute(prompt.clone())?;
         
-        // Small delay to let filesystem settle
+        // Small delay to let file system settle
         std::thread::sleep(std::time::Duration::from_millis(500));
         
         // Capture after state with new session ID
@@ -153,11 +153,17 @@ impl Conversation {
     }
     
     /// Get tools used across all transitions
+    /// 
+    /// Note: This currently returns an empty vector because ParsedSession 
+    /// doesn't implement Clone, so session data is lost when transitions 
+    /// are stored. Tool extraction from transitions requires the parsed 
+    /// session data which isn't preserved during cloning.
     pub fn tools_used(&self) -> Vec<String> {
         let mut tools = std::collections::HashSet::new();
         for transition in &self.transitions {
-            for tool in &transition.execution.tool_calls {
-                tools.insert(tool.clone());
+            // Extract tools from transition's tool executions
+            for tool_exec in transition.tool_executions() {
+                tools.insert(tool_exec.tool_name.clone());
             }
         }
         let mut result: Vec<String> = tools.into_iter().collect();

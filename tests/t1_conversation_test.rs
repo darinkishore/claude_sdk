@@ -38,7 +38,11 @@ fn test_conversation_owns_transitions() {
     println!("   Total transitions: {}", conversation.history().len());
     println!("   Session IDs: {:?}", conversation.session_ids());
     println!("   Total cost: ${}", conversation.total_cost());
-    println!("   Tools used: {:?}", conversation.tools_used());
+    
+    // Note: tool extraction from conversations doesn't work due to cloning issue
+    // See LIMITATIONS.md for details
+    let tools = conversation.tools_used();
+    println!("   Tools used: {:?} (expected empty due to known limitation)", tools);
     
     // Verify transitions are owned by conversation
     assert_eq!(conversation.history().len(), 2);
@@ -50,6 +54,7 @@ fn test_conversation_owns_transitions() {
     // But conversation tracks the chain
     assert_eq!(conversation.session_ids()[0], t1.execution.session_id);
     assert_eq!(conversation.session_ids()[1], t2.execution.session_id);
+    
     
     println!("\n✅ Conversation V2 test passed!");
 }

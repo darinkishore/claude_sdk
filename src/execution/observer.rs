@@ -17,14 +17,16 @@ pub struct EnvironmentSnapshot {
     pub session: Option<ParsedSession>,  // Parsed on demand
 }
 
-// Manual Clone implementation that re-parses the session
+// Manual Clone implementation
+// Note: session is not cloned because ParsedSession doesn't implement Clone
+// This means cloned snapshots lose their parsed session data
 impl Clone for EnvironmentSnapshot {
     fn clone(&self) -> Self {
         Self {
             files: self.files.clone(),
             session_file: self.session_file.clone(),
             timestamp: self.timestamp,
-            session: None,  // Don't clone the parsed session, re-parse if needed
+            session: None,  // Can't clone ParsedSession - would need to re-parse from file
         }
     }
 }
@@ -81,9 +83,7 @@ impl EnvironmentObserver {
         
         // Parse the session
         let parser = SessionParser::new(&session_file);
-        let session = parser.parse()
-            .map_err(|e| ObserverError::ParseError(format!("Failed to parse session: {}", e)))
-            .ok();
+        let session = parser.parse().ok();
         
         Ok(EnvironmentSnapshot {
             files,
