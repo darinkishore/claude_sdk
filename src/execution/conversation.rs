@@ -64,7 +64,7 @@ impl Conversation {
         let before = if self.session_ids.is_empty() {
             // First message - no session to snapshot
             EnvironmentSnapshot {
-                files: self.workspace.snapshot()?.files,
+                files: self.workspace.snapshot_files()?,
                 session_file: PathBuf::new(),
                 timestamp: Utc::now(),
                 session: None,
