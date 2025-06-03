@@ -301,4 +301,14 @@ let before = if continue_session {
 };
 ```
 
-This ensures new messages are properly detected when comparing states. 
+This ensures new messages are properly detected when comparing states.
+
+### TODO: API Improvements
+
+1. **Refactor ClaudePrompt**: The `continue_session` flag is redundant with `resume_session_id`. Should use only `resume_session_id` where:
+   - `None` = start new session
+   - `Some(id)` = continue specific session
+
+2. **Remove project name inference**: Remove any "smart" project name detection or path decoding. We should always work with explicit filesystem paths, never try to infer from Claude project names.
+
+3. **Fix integration tests**: Update test files to work with new API structure 
