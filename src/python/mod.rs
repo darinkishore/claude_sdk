@@ -5,11 +5,13 @@ pub mod exceptions;
 pub mod functions;
 pub mod models;
 pub mod utils;
+pub mod execution;
 
 use classes::{Message, Session, Project};
 use models::{SessionMetadata, ToolResult, ToolExecution, ConversationStats, ConversationNode, ConversationTree, TextBlock, ToolUseBlock, ThinkingBlock, ImageBlock, ToolResultBlock, TokenUsage};
 use exceptions::register_exceptions;
 use functions::{load, find_sessions, find_projects, load_project};
+use execution::register_execution_module;
 
 pub fn register_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Add classes
@@ -39,6 +41,9 @@ pub fn register_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(pyo3::wrap_pyfunction!(find_sessions, m)?)?;
     m.add_function(pyo3::wrap_pyfunction!(find_projects, m)?)?;
     m.add_function(pyo3::wrap_pyfunction!(load_project, m)?)?;
+    
+    // Register execution module types
+    register_execution_module(m)?;
     
     Ok(())
 }

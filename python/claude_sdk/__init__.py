@@ -33,6 +33,13 @@ try:
         ImageBlock,
         ToolResultBlock,
         TokenUsage,
+        # Execution Engine (T1)
+        Workspace,
+        Conversation,
+        Transition,
+        ClaudePrompt,
+        ClaudeExecution,
+        EnvironmentSnapshot,
         # Exceptions
         ClaudeSDKError,
         ParseError,
@@ -129,6 +136,13 @@ __all__ = [
     "ImageBlock",
     "ToolResultBlock",
     "TokenUsage",
+    # Execution Engine (T1)
+    "Workspace",
+    "Conversation",
+    "Transition",
+    "ClaudePrompt",
+    "ClaudeExecution",
+    "EnvironmentSnapshot",
     # Functions
     "load",
     "find_sessions",
