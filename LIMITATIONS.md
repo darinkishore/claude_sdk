@@ -113,6 +113,20 @@ also,
 uh... idk lmao pls report bugs
 
 
+
+ooh also
+i need to go in and manually inspect basically all the python stuff bc that is currecntly not done.
+
+i dont think we're exposing the full parsed JSON when it comes to realtime execution; this is bc of a cloning bug i think.
+
+also some other python TODOs are left in the current state of the repo. thats ok for now though.
+
+lmao
+
+this will likley have a bug or two fyi but it is a very good start; solid, the plumbing is complete and there are not tooooo many bugs.
+
+i intend to use this quite a bit, so hopefully that will help . let us pray
+
 ---
 
 
