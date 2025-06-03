@@ -7,7 +7,18 @@ use chrono::{DateTime, Utc};
 pub struct ClaudePrompt {
     pub text: String,
     pub continue_session: bool,
+    #[serde(default)]
     pub resume_session_id: Option<String>,  // Explicit session to resume
+}
+
+impl Default for ClaudePrompt {
+    fn default() -> Self {
+        Self {
+            text: String::new(),
+            continue_session: false,
+            resume_session_id: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

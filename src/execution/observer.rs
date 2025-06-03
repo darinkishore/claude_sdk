@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 use crate::parser::SessionParser;
 use crate::types::ParsedSession;
+use crate::utils::path::encode_project_path;
 
 // Keep the path-based snapshot for serialization
 #[derive(Debug, Serialize, Deserialize)]
@@ -128,28 +129,7 @@ impl EnvironmentObserver {
             .join("projects");
             
         // Convert workspace path to Claude's project naming pattern
-        // /Users/darin/.claude-sdk/test-environment/test-workspace -> -Users-darin--claude-sdk-test-environment-test-workspace
-        let workspace_str = self.workspace.to_string_lossy();
-        let mut project_name = String::new();
-        let chars: Vec<char> = workspace_str.chars().collect();
-        
-        let mut i = 0;
-        while i < chars.len() {
-            if chars[i] == '/' {
-                // Check if next char is a dot (hidden directory)
-                if i + 1 < chars.len() && chars[i + 1] == '.' {
-                    project_name.push('-');
-                    project_name.push('-');
-                    i += 2; // Skip the slash and dot
-                } else {
-                    project_name.push('-');
-                    i += 1;
-                }
-            } else {
-                project_name.push(chars[i]);
-                i += 1;
-            }
-        }
+        let project_name = encode_project_path(&self.workspace);
             
         let project_dir = claude_projects.join(&project_name);
         
@@ -158,9 +138,9 @@ impl EnvironmentObserver {
         
         if !project_dir.exists() {
             return Err(ObserverError::ProjectNotFound(format!(
-                "Looking for: {} (from workspace: {})", 
-                project_name, 
-                workspace_str
+                "Project directory not found: {:?} (encoded from workspace: {:?})", 
+                project_dir,
+                self.workspace
             )));
         }
         
@@ -194,27 +174,7 @@ impl EnvironmentObserver {
             .join("projects");
             
         // Convert workspace path to Claude's project naming pattern
-        let workspace_str = self.workspace.to_string_lossy();
-        let mut project_name = String::new();
-        let chars: Vec<char> = workspace_str.chars().collect();
-        
-        let mut i = 0;
-        while i < chars.len() {
-            if chars[i] == '/' {
-                // Check if next char is a dot (hidden directory)
-                if i + 1 < chars.len() && chars[i + 1] == '.' {
-                    project_name.push('-');
-                    project_name.push('-');
-                    i += 2; // Skip the slash and dot
-                } else {
-                    project_name.push('-');
-                    i += 1;
-                }
-            } else {
-                project_name.push(chars[i]);
-                i += 1;
-            }
-        }
+        let project_name = encode_project_path(&self.workspace);
             
         let project_dir = claude_projects.join(&project_name);
         let session_file = project_dir.join(format!("{}.jsonl", session_id));
