@@ -44,8 +44,7 @@ uv pip install ./python
 
 ```bash
 cd python
-pip install maturin
-maturin develop
+uv build
 ```
 
 ## Quick Start
@@ -562,7 +561,7 @@ The Claude SDK is built with Rust for exceptional performance:
 ```bash
 pip install claude-sdk
 # or for development
-cd python && maturin develop
+uv build
 ```
 
 #### FileNotFoundError when loading sessions
@@ -623,8 +622,7 @@ cd claude-sdk
 cargo build --release
 
 # Build Python package
-cd python
-maturin build
+uv build
 ```
 
 ### Running tests
@@ -634,9 +632,8 @@ maturin build
 cargo test
 
 # Python tests
-cd python
-maturin develop
-pytest tests/
+uv build
+uv run -m pytest tests/
 ```
 
 ### Contributing
