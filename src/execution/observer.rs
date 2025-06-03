@@ -12,6 +12,7 @@ use crate::utils::path::encode_project_path;
 pub struct EnvironmentSnapshot {
     pub files: HashMap<PathBuf, String>,
     pub session_file: PathBuf,  // Store path for serialization
+    pub session_id: Option<String>,  // Session ID for reconstruction
     pub timestamp: DateTime<Utc>,
     #[serde(skip)]  // Don't serialize the parsed session
     pub session: Option<ParsedSession>,  // Parsed on demand
@@ -25,6 +26,7 @@ impl Clone for EnvironmentSnapshot {
         Self {
             files: self.files.clone(),
             session_file: self.session_file.clone(),
+            session_id: self.session_id.clone(),
             timestamp: self.timestamp,
             session: None,  // Can't clone ParsedSession - would need to re-parse from file
         }
@@ -68,9 +70,15 @@ impl EnvironmentObserver {
             .map_err(|e| ObserverError::ParseError(format!("Failed to parse session: {}", e)))
             .ok();  // Make it optional in case parsing fails
         
+        // Extract session ID from filename
+        let session_id = session_file.file_stem()
+            .and_then(|s| s.to_str())
+            .map(|s| s.to_string());
+        
         Ok(EnvironmentSnapshot {
             files,
             session_file,
+            session_id,
             timestamp: Utc::now(),
             session,
         })
@@ -88,6 +96,7 @@ impl EnvironmentObserver {
         Ok(EnvironmentSnapshot {
             files,
             session_file,
+            session_id: Some(session_id.to_string()),
             timestamp: Utc::now(),
             session,
         })

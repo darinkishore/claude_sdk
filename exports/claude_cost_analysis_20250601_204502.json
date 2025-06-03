@@ -1,0 +1,180 @@
+{
+  "generated_at": "2025-06-01T20:45:02.815850",
+  "summary": {
+    "total_cost": 1046.4220483000001,
+    "total_sessions": 365,
+    "total_messages": 57606,
+    "days_active": 33,
+    "daily_average": 31.709759039393944,
+    "monthly_average": 965.2450651591517,
+    "yearly_projection": 11574.06204937879
+  },
+  "comparisons": {
+    "daily": "A fancy dinner for one",
+    "monthly_subscriptions": [
+      "48.3x Chatgpt Plus",
+      "96.5x Github Copilot",
+      "62.3x Netflix"
+    ],
+    "yearly_equivalent": "87.2 months of ChatGPT Plus"
+  },
+  "patterns": {
+    "by_hour": {
+      "2": 107.76724099999997,
+      "4": 76.21653855000007,
+      "0": 50.5729467,
+      "22": 104.5735566,
+      "21": 113.9276052,
+      "20": 61.24164705000001,
+      "23": 60.771084,
+      "7": 82.2155417,
+      "8": 4.380865949999999,
+      "6": 18.6436656,
+      "5": 58.62889890000002,
+      "19": 86.96565659999997,
+      "3": 47.64531435000001,
+      "1": 52.51461015000001,
+      "17": 23.65044074999999,
+      "18": 88.45750409999998,
+      "16": 6.512562899999999,
+      "9": 0.9270509999999997,
+      "15": 0.8093171999999998
+    },
+    "by_day": {
+      "Monday": 89.99327309999998,
+      "Saturday": 71.03310120000003,
+      "Friday": 316.52413165000013,
+      "Sunday": 56.97925545,
+      "Thursday": 238.60417034999986,
+      "Wednesday": 193.58008995000006,
+      "Tuesday": 79.70802660000004
+    },
+    "by_month": {
+      "2025-06": 42.839795999999986,
+      "2025-05": 995.6767411000004,
+      "2025-04": 7.905511200000001
+    },
+    "by_model": {
+      "claude-opus-4-20250514": 285.29736000000037,
+      "claude-sonnet-4-20250514": 347.4293232999999,
+      "claude-3-7-sonnet-20250219": 413.5326089999993,
+      "openai/gpt-4.1": 0.162756
+    },
+    "by_tool": {
+      "Bash": 342.4573750781862,
+      "Read": 214.5863543601076,
+      "Edit": 159.50891214118442,
+      "TodoWrite": 96.67299597269606,
+      "Write": 79.55252372618297,
+      "Task": 31.021643820869954,
+      "Grep": 28.95639731753042,
+      "LS": 20.899706357537656,
+      "MultiEdit": 16.251941198891735,
+      "Batch": 16.214455355955508
+    }
+  },
+  "roi_metrics": {
+    "cost_per_problem": 3.332554293949045,
+    "cost_per_code_op": 0.21407979711538463,
+    "cost_per_idea": 0.1928888568294931,
+    "cost_per_learning": 0.42693678021215836,
+    "problems_solved": 314,
+    "code_operations": 4888,
+    "ideas_explored": 5425,
+    "learning_messages": 2451
+  },
+  "insights": [
+    "Your most expensive hour is 21:00 ($113.93 total)",
+    "Fridays are your biggest investment days",
+    "You prefer 3 models ($413.53 spent)",
+    "Your usage is growing 442% every 3 months"
+  ],
+  "top_sessions": [
+    {
+      "session_id": "7f9944df-bf5f-4a09-81e0-19420ef7ab44",
+      "cost": 56.272492800000016,
+      "messages": 3404,
+      "tools_used": [
+        "Read",
+        "Bash",
+        "MultiEdit",
+        "Edit",
+        "Glob",
+        "Task",
+        "Write",
+        "TodoWrite",
+        "Batch",
+        "LS",
+        "mcp__fetch__fetch",
+        "mcp__brave-search__brave_web_search"
+      ]
+    },
+    {
+      "session_id": "f8db8b2f-6bcf-4846-ada7-eb42277d16ad",
+      "cost": 48.46093275000005,
+      "messages": 512,
+      "tools_used": [
+        "WebFetch",
+        "Read",
+        "MultiEdit",
+        "TodoWrite",
+        "LS",
+        "Write",
+        "Task",
+        "WebSearch",
+        "Edit",
+        "Bash"
+      ]
+    },
+    {
+      "session_id": "b66bb4d6-edbf-46b7-83af-ba465c50689c",
+      "cost": 43.172086500000006,
+      "messages": 582,
+      "tools_used": [
+        "TodoRead",
+        "Edit",
+        "Write",
+        "LS",
+        "WebSearch",
+        "Read",
+        "MultiEdit",
+        "Task",
+        "TodoWrite",
+        "Bash",
+        "Glob",
+        "Grep"
+      ]
+    },
+    {
+      "session_id": "c2031750-b9e8-4e6f-aa3f-6ca58616f791",
+      "cost": 38.817008550000004,
+      "messages": 453,
+      "tools_used": [
+        "TodoWrite",
+        "MultiEdit",
+        "Bash",
+        "Write",
+        "Edit",
+        "Read",
+        "mcp__ide__getDiagnostics"
+      ]
+    },
+    {
+      "session_id": "7b46aa2e-591b-45cb-9299-3a7922c6ea57",
+      "cost": 38.497543500000006,
+      "messages": 557,
+      "tools_used": [
+        "Task",
+        "LS",
+        "TodoWrite",
+        "Edit",
+        "Grep",
+        "WebSearch",
+        "Bash",
+        "Read",
+        "Glob",
+        "Write"
+      ]
+    }
+  ]
+}

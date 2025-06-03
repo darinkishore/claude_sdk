@@ -13,6 +13,7 @@ use super::{
     Workspace, WorkspaceError,
     ClaudePrompt,
     EnvironmentSnapshot, Transition,
+    recorder::{TransitionRecorder, RecorderError},
 };
 
 /// Serializable representation of a Conversation
@@ -40,6 +41,9 @@ pub struct Conversation {
     
     /// Metadata about the conversation
     metadata: ConversationMetadata,
+    
+    /// Optional recorder for persisting transitions to disk
+    recorder: Option<TransitionRecorder>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -53,6 +57,23 @@ pub struct ConversationMetadata {
 impl Conversation {
     /// Create a new conversation in the given workspace
     pub fn new(workspace: Arc<Workspace>) -> Self {
+        Self::new_with_options(workspace, false)
+    }
+    
+    /// Create a new conversation with options
+    pub fn new_with_options(workspace: Arc<Workspace>, record: bool) -> Self {
+        let recorder = if record {
+            match TransitionRecorder::new(workspace.path()) {
+                Ok(r) => Some(r),
+                Err(e) => {
+                    eprintln!("Warning: Failed to create transition recorder: {}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        };
+        
         Self {
             id: Uuid::new_v4(),
             workspace: workspace.clone(),
@@ -64,6 +85,7 @@ impl Conversation {
                 total_cost_usd: 0.0,
                 total_messages: 0,
             },
+            recorder,
         }
     }
     
@@ -75,6 +97,7 @@ impl Conversation {
             EnvironmentSnapshot {
                 files: self.workspace.snapshot_files()?,
                 session_file: PathBuf::new(),
+                session_id: None,
                 timestamp: Utc::now(),
                 session: None,
             }
@@ -116,6 +139,13 @@ impl Conversation {
         self.session_ids.push(execution.session_id);
         self.metadata.total_cost_usd += execution.cost;
         self.metadata.total_messages += 1;
+        
+        // Record if recorder is enabled
+        if let Some(ref mut recorder) = self.recorder {
+            if let Err(e) = recorder.record(transition.clone()) {
+                eprintln!("Warning: Failed to record transition: {}", e);
+            }
+        }
         
         // Store and return the transition
         self.transitions.push(transition.clone());
@@ -195,6 +225,7 @@ impl Conversation {
             transitions: saved.transitions,
             session_ids: saved.session_ids,
             metadata: saved.metadata,
+            recorder: None,  // Recorder isn't persisted, create fresh if needed
         })
     }
 }
@@ -209,6 +240,9 @@ pub enum ConversationError {
     
     #[error("Observer error: {0}")]  
     ObserverError(#[from] super::ObserverError),
+    
+    #[error("Recorder error: {0}")]
+    RecorderError(#[from] RecorderError),
     
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),

@@ -51,13 +51,9 @@ let tools = conversation.tools_used(); // ✗ Returns empty
 
 ### 4. Response Content for Tool-Only Executions
 
+this is a bug. 
 **Issue**: When Claude only uses tools without text output, the response is "(no content)".
-
-**Cause**: Claude's JSON response format returns this when there's no text output.
-
-**Impact**: May be confusing but doesn't affect functionality.
-
-**Status**: Working as designed.
+ need to fix these.
 
 ### 5. Permission Requirements
 
@@ -67,6 +63,9 @@ let tools = conversation.tools_used(); // ✗ Returns empty
 
 **Status**: This is a Claude security feature. The SDK uses `--allowedTools` by default.
 
+note: this is a bug too. if we accept it once interactively it should go away globally UNLESS claude team pushes a lovely update that resets it.
+
+
 ## T0 Parser Limitations
 
 ### 1. Large Session Files
@@ -75,7 +74,7 @@ let tools = conversation.tools_used(); // ✗ Returns empty
 
 **Impact**: Could cause memory issues with extremely long sessions.
 
-**Status**: Acceptable for normal use cases.
+**Status**: Acceptable for normal use cases. 
 
 ## General Architecture Limitations
 
@@ -91,9 +90,10 @@ let tools = conversation.tools_used(); // ✗ Returns empty
 
 **Issue**: The SDK uses snapshots rather than streaming updates.
 
-**Impact**: Can't observe Claude's execution in real-time.
-
 **Status**: Intentional design choice for simplicity.
+
+its bascially realtime though, like literal microsecond delays.
+
 
 ## Python Binding Limitations
 
@@ -107,6 +107,15 @@ These limitations inform the design of T2 (orchestration layer):
 - Enhanced tool tracking
 - Session management strategies
 
+
+
+also,
+uh... idk lmao pls report bugs
+
+
 ---
+
+
+
 
 Last updated: 2025-06-03

@@ -1,0 +1,114 @@
+{
+  "generated_at": "2025-06-01T21:11:48.412039",
+  "total_cost": 1057.60833505,
+  "total_sessions": 365,
+  "time_analysis": {
+    "hourly_costs": {
+      "2": 118.95352774999996,
+      "4": 76.21653855000007,
+      "0": 50.5729467,
+      "22": 104.5735566,
+      "21": 113.9276052,
+      "20": 61.24164705000001,
+      "23": 60.771084,
+      "7": 82.2155417,
+      "8": 4.380865949999999,
+      "6": 18.6436656,
+      "5": 58.62889890000002,
+      "19": 86.96565659999997,
+      "3": 47.64531435000001,
+      "1": 52.51461015000001,
+      "17": 23.65044074999999,
+      "18": 88.45750409999998,
+      "16": 6.512562899999999,
+      "9": 0.9270509999999997,
+      "15": 0.8093171999999998
+    },
+    "hourly_sessions": {
+      "2": 13,
+      "4": 10,
+      "0": 28,
+      "22": 29,
+      "21": 25,
+      "20": 45,
+      "23": 12,
+      "7": 33,
+      "8": 16,
+      "6": 11,
+      "5": 4,
+      "19": 30,
+      "3": 8,
+      "1": 16,
+      "17": 28,
+      "18": 35,
+      "16": 12,
+      "9": 9,
+      "15": 1
+    },
+    "weekday_costs": {
+      "Monday": 101.17955984999996,
+      "Saturday": 71.03310120000003,
+      "Friday": 316.52413165000013,
+      "Sunday": 56.97925545,
+      "Thursday": 238.60417034999986,
+      "Wednesday": 193.58008995000006,
+      "Tuesday": 79.70802660000004
+    },
+    "late_night_cost": 330.4574829499999,
+    "late_night_sessions": 77,
+    "business_hours_cost": 8.248931099999998,
+    "business_hours_sessions": 22,
+    "total_cost": 1057.60833505
+  },
+  "outliers": {
+    "most_expensive": {
+      "cost": 56.272492800000016,
+      "project": "apply-model",
+      "duration_hours": 1.9602777777777778,
+      "messages": 3404,
+      "first_message": "> Hi Claude!\n\n  I want to implement the dataset here: https://huggingface.co/datasets/internlm/SWE-F...",
+      "timestamp": "2025-05-07T05:33:32+00:00",
+      "summary": "Debugging session"
+    },
+    "longest_duration": {
+      "duration": 255125,
+      "duration_hours": 70.86805555555556,
+      "cost": 7.577923800000001,
+      "project": "apply-model",
+      "messages": 341,
+      "first_message": "This session is being continued from a previous conversation that ran out of context. The conversati...",
+      "summary": "Debugging test failures"
+    },
+    "deepest_conversation": {
+      "depth": 458,
+      "cost": 18.513246650000006,
+      "project": "spec_compliance",
+      "first_message": "This session is being continued from a previous conversation that ran out of context. The conversati...",
+      "summary": "Debugging test failures"
+    },
+    "highest_cost_per_message": {
+      "per_message": 0.1767717195378151,
+      "total_cost": 42.07166924999999,
+      "messages": 238,
+      "project": "rust_sdk",
+      "first_message": "hi claude ! we've put together a great SDK together, but we don't have docs, our README is out of da...",
+      "summary": "Code analysis"
+    },
+    "most_retries": {
+      "branches": 814,
+      "cost": 56.272492800000016,
+      "project": "apply-model",
+      "first_message": "> Hi Claude!\n\n  I want to implement the dataset here: https://huggingface.co/datasets/internlm/SWE-F...",
+      "summary": "Debugging session"
+    },
+    "shortest_expensive": {
+      "duration": 1976,
+      "duration_minutes": 32.93333333333333,
+      "cost": 11.951218200000003,
+      "project": "apply-model",
+      "messages": 496,
+      "first_message": "hi claude! can you please help me check for edge cases in the swe fixer dataset? \n\ntrying to figure ...",
+      "summary": "Debugging session"
+    }
+  }
+}
