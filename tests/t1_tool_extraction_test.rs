@@ -3,7 +3,8 @@
 
 mod common;
 
-use claude_sdk::execution::{ClaudeEnvironment};
+use std::sync::Arc;
+use claude_sdk::execution::{Workspace, Conversation};
 use common::TestEnvironment;
 
 #[test]
@@ -12,11 +13,12 @@ fn test_tool_extraction() {
     println!("\n=== Tool Extraction Test ===\n");
     
     let env = TestEnvironment::setup();
-    let mut claude_env = ClaudeEnvironment::new(env.workspace.clone()).unwrap();
+    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let mut conversation = Conversation::new(workspace);
     
     // Execute a prompt that will use multiple tools
     println!("1. Executing prompt with tool usage...");
-    let transition = claude_env.execute(
+    let transition = conversation.send(
         "Create a Python file called calculator.py with add and multiply functions, then read it back to verify"
     ).unwrap();
     

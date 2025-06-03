@@ -3,7 +3,8 @@
 
 mod common;
 
-use claude_sdk::execution::ClaudeEnvironment;
+use std::sync::Arc;
+use claude_sdk::execution::{Workspace, Conversation};
 use common::TestEnvironment;
 
 #[test]
@@ -12,11 +13,12 @@ fn test_session_continuation() {
     println!("\n=== Session Continuation Test ===\n");
     
     let env = TestEnvironment::setup();
-    let mut claude_env = ClaudeEnvironment::new(env.workspace.clone()).unwrap();
+    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let mut conversation = Conversation::new(workspace);
     
     // First execution - create a file
     println!("1. First execution - creating initial file...");
-    let transition1 = claude_env.execute(
+    let transition1 = conversation.send(
         "Create a file called story.txt with 'Once upon a time'"
     ).unwrap();
     
@@ -25,9 +27,8 @@ fn test_session_continuation() {
     
     // Continue the session
     println!("\n2. Continuing session...");
-    let transition2 = claude_env.execute_with_options(
-        "Add ' there was a brave knight' to the story.txt file",
-        true  // continue_session = true
+    let transition2 = conversation.send(
+        "Add ' there was a brave knight' to the story.txt file"
     ).unwrap();
     
     println!("   Session ID: {}", transition2.execution.session_id);
@@ -36,12 +37,13 @@ fn test_session_continuation() {
     // Check if it's a different session ID (as we discovered)
     println!("\n3. Analysis:");
     println!("   Same session ID: {}", transition1.execution.session_id == transition2.execution.session_id);
-    println!("   Session 1 messages: {:?}", transition1.after.session.as_ref().map(|s| s.messages.len()));
-    println!("   Session 2 messages: {:?}", transition2.after.session.as_ref().map(|s| s.messages.len()));
+    println!("   Total transitions: {}", conversation.history().len());
+    println!("   Session IDs: {:?}", conversation.session_ids());
+    println!("   Total cost: ${}", conversation.total_cost());
     
     // Check if Claude remembered the context
-    let tools_used = transition2.tools_used();
-    println!("   Tools used in continuation: {:?}", tools_used);
+    let tools_used = conversation.tools_used();
+    println!("   Tools used in conversation: {:?}", tools_used);
     
     println!("\n✅ Session continuation test completed!");
 }
