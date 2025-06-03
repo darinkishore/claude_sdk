@@ -1,7 +1,7 @@
 // Common test utilities for T1 integration tests
 // Provides a fixed test environment at ~/.claude-sdk/test-environment
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs;
 use std::env;
 
