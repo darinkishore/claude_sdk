@@ -4,7 +4,6 @@
 
 mod executor_integration_tests {
     use claude_sdk::execution::{ClaudeExecutor, ClaudePrompt};
-    use std::path::PathBuf;
     use tempfile::TempDir;
 
     #[test]
@@ -22,6 +21,7 @@ mod executor_integration_tests {
         let prompt = ClaudePrompt {
             text: "Create a file called test.txt with the content 'Hello from Claude'".to_string(),
             continue_session: false,
+            resume_session_id: None,
         };
         
         let execution = executor.execute(prompt.clone())
@@ -77,6 +77,7 @@ mod executor_integration_tests {
         let prompt1 = ClaudePrompt {
             text: "Create a Python file called hello.py with a function that prints 'Hello'".to_string(),
             continue_session: false,
+            resume_session_id: None,
         };
         
         let execution1 = executor.execute(prompt1)
@@ -88,6 +89,7 @@ mod executor_integration_tests {
         let prompt2 = ClaudePrompt {
             text: "Now add a main block that calls the hello function".to_string(),
             continue_session: true,
+            resume_session_id: None,
         };
         
         let execution2 = executor.execute(prompt2)

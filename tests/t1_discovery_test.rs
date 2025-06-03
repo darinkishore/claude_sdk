@@ -24,6 +24,7 @@ fn discover_claude_project_naming() {
     let prompt = ClaudePrompt {
         text: "Create a file called discovery.txt with the text 'Found me!'".to_string(),
         continue_session: false,
+        resume_session_id: None,
     };
     
     let execution = executor.execute(prompt)

@@ -8,7 +8,7 @@
 // 2. Mock the session file location (requires refactoring)
 // 3. Test only the file snapshot functionality
 
-use claude_sdk::execution::EnvironmentObserver;
+use claude_sdk::execution::{EnvironmentObserver, ClaudeExecutor, ClaudePrompt};
 use std::path::PathBuf;
 use tempfile::TempDir;
 use std::fs;
@@ -73,6 +73,7 @@ fn test_environment_observer_file_patterns() {
     executor.execute(ClaudePrompt {
         text: "List files".to_string(),
         continue_session: false,
+        resume_session_id: None,
     }).unwrap();
     
     std::thread::sleep(std::time::Duration::from_secs(1));
