@@ -142,7 +142,11 @@ impl Project {
                 }
                 Err(e) => {
                     // Log other errors but continue processing
-                    eprintln!("Warning: Failed to parse session file {:?}: {}", file_path, e);
+                    tracing::warn!(
+                        "Failed to parse session file {:?}: {}",
+                        file_path,
+                        e
+                    );
                     continue;
                 }
             }

@@ -49,7 +49,7 @@ fn test_parse_real_sessions_impl() {
     let projects_dir = match get_claude_projects_dir() {
         Some(dir) => dir,
         None => {
-            eprintln!("Claude projects directory not found, skipping integration tests");
+            tracing::warn!("Claude projects directory not found, skipping integration tests");
             return;
         }
     };
@@ -147,7 +147,7 @@ fn test_large_session_performance() {
     let projects_dir = match get_claude_projects_dir() {
         Some(dir) => dir,
         None => {
-            eprintln!("Claude projects directory not found, skipping test");
+            tracing::warn!("Claude projects directory not found, skipping test");
             return;
         }
     };
@@ -209,7 +209,7 @@ fn test_tool_extraction_real_data() {
     let projects_dir = match get_claude_projects_dir() {
         Some(dir) => dir,
         None => {
-            eprintln!("Claude projects directory not found, skipping test");
+            tracing::warn!("Claude projects directory not found, skipping test");
             return;
         }
     };
@@ -262,7 +262,7 @@ fn test_session_info_quick_scan() {
     let projects_dir = match get_claude_projects_dir() {
         Some(dir) => dir,
         None => {
-            eprintln!("Claude projects directory not found, skipping test");
+            tracing::warn!("Claude projects directory not found, skipping test");
             return;
         }
     };
