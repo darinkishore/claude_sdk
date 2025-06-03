@@ -133,8 +133,6 @@ impl EnvironmentObserver {
             
         let project_dir = claude_projects.join(&project_name);
         
-        eprintln!("Looking for Claude project: {:?}", project_dir);
-        eprintln!("Project exists: {}", project_dir.exists());
         
         if !project_dir.exists() {
             return Err(ObserverError::ProjectNotFound(format!(
