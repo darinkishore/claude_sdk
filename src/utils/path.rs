@@ -22,6 +22,10 @@ pub fn encode_project_path(path: &Path) -> String {
                 encoded.push('-');
                 i += 1;
             }
+        } else if chars[i] == '_' {
+            // Claude converts underscores to hyphens
+            encoded.push('-');
+            i += 1;
         } else {
             encoded.push(chars[i]);
             i += 1;
@@ -55,6 +59,10 @@ mod tests {
         
         let hidden_path = Path::new("/Users/darin/.claude");
         assert_eq!(encode_project_path(hidden_path), "-Users-darin--claude");
+        
+        // Test underscore conversion
+        let underscore_path = Path::new("/Users/darin/.claude/rust_sdk");
+        assert_eq!(encode_project_path(underscore_path), "-Users-darin--claude-rust-sdk");
     }
 
     #[test]

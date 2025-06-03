@@ -10,6 +10,7 @@ A high-performance Python library for parsing and analyzing Claude Code session 
 - **Python Bindings**: Use from Python with a clean, Pythonic API
 - **Cost Tracking**: Monitor token usage and costs across sessions
 - **T1 Execution Engine**: Programmatic control over Claude CLI with transition recording
+- **High-Level Agent API**: Simple interface for Claude conversations with automatic state management
 
 For known limitations and caveats, see [LIMITATIONS.md](LIMITATIONS.md).
 
@@ -61,6 +62,8 @@ maturin develop
 
 ## Quick Start
 
+### Parsing Sessions (T0)
+
 ```python
 import claude_sdk
 
@@ -82,6 +85,30 @@ sessions = claude_sdk.find_sessions()
 for session_path in sessions:
     print(f"Found session: {session_path}")
 ```
+
+### Executing Claude (T1)
+
+```python
+import claude_sdk
+
+# High-level API - recommended for most users
+agent = claude_sdk.ClaudeAgent("/path/to/your/project")
+
+# Send a message and get results
+response = agent.send("Create a Python function that calculates fibonacci numbers")
+print(f"Claude said: {response.text}")
+print(f"Cost: ${response.cost:.4f}")
+print(f"Files created: {response.files_created}")
+
+# Continue the conversation
+response2 = agent.send("Now add type hints and a docstring")
+print(f"Total cost: ${agent.total_cost:.4f}")
+
+# Save the conversation
+agent.save_conversation("fibonacci_session.json")
+```
+
+⚠️ **Important**: Claude execution requires a proper project directory. Do not test in system temp directories. See the [Python README](python/README.md) for details.
 
 ## Core Concepts
 

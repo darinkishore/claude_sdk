@@ -211,6 +211,7 @@ ls ../target/wheels/
 
 ## Available Python API
 
+### T0 - Session Parser
 ```python
 import claude_sdk
 
@@ -225,6 +226,29 @@ claude_sdk.Session       # Session data
 claude_sdk.Message       # Individual messages
 claude_sdk.Project       # Project with multiple sessions
 claude_sdk.ToolResult    # Tool execution results
+```
+
+### T1 - Execution Engine
+```python
+# High-level API
+agent = claude_sdk.ClaudeAgent("/path/to/project")
+response = agent.send("Build something")
+print(response.text, response.cost, response.files_modified)
+
+# Low-level API
+workspace = claude_sdk.Workspace("/path/to/project")
+conversation = claude_sdk.Conversation(workspace)
+transition = conversation.send("Do something")
+
+# Classes
+claude_sdk.ClaudeAgent      # High-level conversation interface
+claude_sdk.AgentResponse    # User-friendly response wrapper
+claude_sdk.Workspace        # Execution context
+claude_sdk.Conversation     # Manages transitions
+claude_sdk.Transition       # Before/after state + execution
+claude_sdk.ClaudePrompt     # Prompt configuration
+claude_sdk.ClaudeExecution  # Execution results
+claude_sdk.EnvironmentSnapshot  # Workspace state
 
 # Exceptions
 claude_sdk.ClaudeSDKError
@@ -274,6 +298,33 @@ cd python && maturin develop
 
 - ALWAYS use uv run before typing python. it sets up the environment properly. Use `uv add` to add packages. 
 - Use uv build to build the project.
+
+## Important Claude CLI Integration Notes
+
+### Directory Requirements
+- **Claude CLI requires a proper project context** - It won't work in arbitrary temp directories
+- Claude creates project directories at `~/.claude/projects/` with encoded names
+- Path encoding: `/Users/name/.claude/rust_sdk` → `-Users-name--claude-rust-sdk`
+  - Slashes → hyphens
+  - Dots after slashes → double hyphens  
+  - **Underscores → hyphens** (important!)
+
+### Testing Execution
+- **DO NOT test in system temp directories** (`/tmp`, `/var/folders/...`)
+- Instead, test in:
+  - Subdirectories of existing projects: `/path/to/project/.claude-sdk-test/`
+  - User-owned directories: `~/test-claude-sdk/`
+- Claude needs to initialize the project directory on first use
+
+### Session File Timing
+- Claude writes session files immediately after execution (microseconds)
+- The `EnvironmentObserver` expects to find these files in `~/.claude/projects/[encoded-path]/`
+- If testing in a new directory, Claude may need to be run once manually to initialize
+
+### Workspace Constraints
+- `Workspace` is wrapped in `Arc<>` for thread safety, preventing runtime mutation
+- Settings like `skip_permissions` must be set at creation time (not yet exposed in Python)
+- Default configuration uses standard Claude tools (Task, Bash, Read, Edit, etc.)
 
 ## T1 Implementation Notes
 

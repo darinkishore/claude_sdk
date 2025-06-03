@@ -45,6 +45,15 @@ impl PyWorkspace {
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
+    
+    fn set_skip_permissions(&self, skip: bool) -> PyResult<()> {
+        // We need mutable access to workspace, but PyWorkspace holds Arc<RustWorkspace>
+        // This is a limitation of the current design - we'd need Arc<Mutex<RustWorkspace>>
+        // For now, let's document this limitation
+        Err(PyErr::new::<pyo3::exceptions::PyNotImplementedError, _>(
+            "set_skip_permissions not yet implemented due to Arc wrapper"
+        ))
+    }
 }
 
 /// Python wrapper for Conversation
@@ -106,6 +115,13 @@ impl PyConversation {
     fn save(&self, path: &str) -> PyResult<()> {
         self.inner.save(&PathBuf::from(path))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))
+    }
+    
+    #[staticmethod]
+    fn load(path: &str, workspace: &PyWorkspace) -> PyResult<Self> {
+        let conversation = RustConversation::load(&PathBuf::from(path), workspace.inner.clone())
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
+        Ok(Self { inner: conversation })
     }
 }
 
