@@ -240,7 +240,11 @@ pub fn load_project(project_identifier: &str, base_path: Option<&str>) -> PyResu
             }
             Err(e) => {
                 // Log warning but continue loading other sessions
-                eprintln!("Warning: Failed to parse session {}: {}", session_path.display(), e);
+                tracing::warn!(
+                    "Failed to parse session {}: {}",
+                    session_path.display(),
+                    e
+                );
             }
         }
     }

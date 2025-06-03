@@ -79,7 +79,7 @@ impl SessionParser {
                 }
                 Some(other) => {
                     // Unknown record type - skip it
-                    eprintln!("Warning: Unknown record type '{}' at line {}, skipping", other, line_num + 1);
+                    tracing::warn!("Unknown record type '{}' at line {}, skipping", other, line_num + 1);
                 }
                 None => {
                     return Err(ClaudeError::ParseError(ParseError::InvalidJsonl {

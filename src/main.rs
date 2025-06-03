@@ -5,8 +5,8 @@ fn main() -> Result<(), ClaudeError> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: {} <session.jsonl>", args[0]);
-        eprintln!(
+        tracing::error!("Usage: {} <session.jsonl>", args[0]);
+        tracing::error!(
             "\nExample: {} /path/to/session_20240101_120000.jsonl",
             args[0]
         );
