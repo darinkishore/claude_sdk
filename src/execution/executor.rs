@@ -133,7 +133,7 @@ impl ClaudeExecutor {
             session_id: response.session_id.clone(),
             cost: response.cost_usd,
             duration_ms: start.elapsed().as_millis() as u64,
-            tool_calls: extract_tool_calls(&response),
+            tool_calls: extract_tool_calls(&self.working_directory, &response),
             model: response.model.unwrap_or_else(|| "unknown".to_string()),
             timestamp: Utc::now(),
         })
@@ -157,10 +157,40 @@ struct ClaudeJsonResponse {
     duration_ms: u64,
 }
 
-fn extract_tool_calls(_response: &ClaudeJsonResponse) -> Vec<String> {
-    // Tool calls are now extracted from ParsedSession after execution
-    // This placeholder remains for backward compatibility
-    Vec::new()
+use crate::parser::SessionParser;
+use crate::utils::path::encode_project_path;
+use crate::types::ContentBlock;
+
+fn extract_tool_calls(workspace: &std::path::Path, response: &ClaudeJsonResponse) -> Vec<String> {
+    let home = match home::home_dir() {
+        Some(h) => h,
+        None => return Vec::new(),
+    };
+
+    let project_dir = home
+        .join(".claude")
+        .join("projects")
+        .join(encode_project_path(workspace));
+
+    let session_file = project_dir.join(format!("{}.jsonl", response.session_id));
+    let parser = SessionParser::new(&session_file);
+
+    match parser.parse() {
+        Ok(session) => {
+            let mut tools = std::collections::HashSet::new();
+            for msg in session.messages {
+                for block in msg.message.content {
+                    if let ContentBlock::ToolUse { name, .. } = block {
+                        tools.insert(name);
+                    }
+                }
+            }
+            let mut result: Vec<String> = tools.into_iter().collect();
+            result.sort();
+            result
+        }
+        Err(_) => Vec::new(),
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -176,4 +206,45 @@ pub enum ExecutorError {
     
     #[error("Failed to parse Claude response: {0}")]
     ParseError(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::tempdir;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_extract_tool_calls_from_fixture() {
+        // Setup temporary HOME to mimic Claude project layout
+        let tmp_home = tempdir().unwrap();
+        std::env::set_var("HOME", tmp_home.path());
+
+        // Workspace path from fixture
+        let workspace = PathBuf::from("/home/test/project");
+        let project_dir = tmp_home
+            .path()
+            .join(".claude")
+            .join("projects")
+            .join(encode_project_path(&workspace));
+        fs::create_dir_all(&project_dir).unwrap();
+
+        // Copy fixture session file to expected location
+        let session_file = project_dir.join("sess1.jsonl");
+        fs::copy("tests/fixtures/example_sample.jsonl", &session_file).unwrap();
+
+        // Build fake response
+        let response = ClaudeJsonResponse {
+            result: String::new(),
+            session_id: "sess1".to_string(),
+            cost_usd: 0.0,
+            model: None,
+            total_cost: 0.0,
+            duration_ms: 0,
+        };
+
+        let tools = extract_tool_calls(&workspace, &response);
+        assert_eq!(tools, vec!["echo".to_string()]);
+    }
 }
