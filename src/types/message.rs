@@ -9,30 +9,30 @@ use super::enums::{UserType, MessageType, Role, StopReason};
 /// Represents a single message record from Claude Code JSONL
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MessageRecord {
-    #[serde(rename = "parentUuid")]
+    #[serde(rename = "parentUuid", alias = "parent_uuid")]
     pub parent_uuid: Option<Uuid>,
-    #[serde(rename = "isSidechain")]
+    #[serde(rename = "isSidechain", alias = "is_sidechain")]
     pub is_sidechain: bool,
-    #[serde(rename = "userType")]
+    #[serde(rename = "userType", alias = "user_type")]
     pub user_type: UserType,
     pub cwd: PathBuf,
-    #[serde(rename = "sessionId")]
+    #[serde(rename = "sessionId", alias = "session_id")]
     pub session_id: String,
     pub version: String,
-    #[serde(rename = "type")]
+    #[serde(rename = "type", alias = "message_type")]
     pub message_type: MessageType,
     pub message: Message,
-    #[serde(rename = "costUSD")]
+    #[serde(rename = "costUSD", alias = "cost_usd")]
     pub cost_usd: Option<f64>,
-    #[serde(rename = "durationMs")]
+    #[serde(rename = "durationMs", alias = "duration_ms")]
     pub duration_ms: Option<u64>,
-    #[serde(rename = "requestId")]
+    #[serde(rename = "requestId", alias = "request_id")]
     pub request_id: Option<String>,
     pub uuid: Uuid,
     pub timestamp: DateTime<Utc>,
-    #[serde(rename = "toolUseResult")]
+    #[serde(rename = "toolUseResult", alias = "tool_use_result")]
     pub tool_use_result: Option<serde_json::Value>,
-    #[serde(rename = "isMeta")]
+    #[serde(rename = "isMeta", alias = "is_meta")]
     pub is_meta: Option<bool>,
 }
 

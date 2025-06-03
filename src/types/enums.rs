@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum UserType {
-    #[serde(rename = "external")]
+    #[serde(rename = "external", alias = "human")]
     External,
-    #[serde(rename = "internal")]
+    #[serde(rename = "internal", alias = "system")]
     Internal,
 }
 

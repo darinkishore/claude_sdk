@@ -47,8 +47,13 @@ impl SessionParser {
                 }
             };
             
-            // Check the type field
-            match json_value.get("type").and_then(|t| t.as_str()) {
+            // Check the record type field, supporting both `type` and `message_type`
+            let record_type = json_value
+                .get("type")
+                .or_else(|| json_value.get("message_type"))
+                .and_then(|t| t.as_str());
+
+            match record_type {
                 Some("summary") => {
                     match serde_json::from_value::<SummaryRecord>(json_value) {
                         Ok(summary) => summaries.push(summary),
@@ -84,7 +89,7 @@ impl SessionParser {
                 None => {
                     return Err(ClaudeError::ParseError(ParseError::InvalidJsonl {
                         line: line_num + 1,
-                        message: "Missing 'type' field".to_string(),
+                        message: "Missing 'type' or 'message_type' field".to_string(),
                     }));
                 }
             }
