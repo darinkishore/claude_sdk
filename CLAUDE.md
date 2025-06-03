@@ -13,7 +13,7 @@ cd rust_sdk
 
 # Build and install in development mode
 cd python
-maturin develop
+uv build
 
 # Test the installation
 python -c "import claude_sdk; print('✅ Import successful!')"
@@ -63,13 +63,13 @@ cargo test
 cd python
 
 # Development build (installs in current Python env)
-maturin develop
+uv build
 
 # Production build (creates wheel)
-maturin build
+uv build --release
 
 # Build with specific features
-maturin develop --features python
+uv build --features python
 ```
 
 ## Testing
@@ -93,10 +93,10 @@ cargo test -- --nocapture
 cd python
 
 # Install in development mode first
-maturin develop
+uv build
 
 # Run Python tests (if you have any)
-python -m pytest tests/
+uv run -m pytest tests/
 
 # Quick import test
 python -c "import claude_sdk; print('✅ Working!')"
@@ -127,7 +127,7 @@ print(f'Loaded session with {len(session.messages)} messages')
 cd python
 
 # Rebuild and reinstall
-maturin develop
+uv build
 
 # Test your changes
 python -c "import claude_sdk; # your test code"
@@ -139,7 +139,7 @@ python -c "import claude_sdk; # your test code"
 cd python
 
 # Build wheel for distribution
-maturin build --release
+uv build --release
 
 # Wheel will be in ../target/wheels/
 ls ../target/wheels/
@@ -163,23 +163,21 @@ ls ../target/wheels/
 ### Build Failures
 
 **Error**: `file not found for module 'python'`
-- **Solution**: Build from project root or use `maturin develop` from `python/` directory
+- **Solution**: Build from project root or use `uv build` from `python/` directory
 
 **Error**: `PyInit symbol not found`
 - **Solution**: Ensure `#[pymodule]` function name matches expected import structure
 
 ### Import Failures
 
-**Error**: `ImportError: Failed to import Rust core module`
-- **Solution**: Run `maturin develop` to rebuild the extension
+- **Solution**: Run `uv build` to rebuild the extension
 - **Check**: Make sure you're in the right Python environment
 
-**Error**: `dlopen failed` or `.so file not found`
-- **Solution**: Use `maturin develop` instead of `maturin build` for development
+- **Solution**: Use `uv build` instead of `uv build --release` for development
 
 ### Development Tips
 
-1. **Use `maturin develop`** for development - it handles the shared library correctly
+1. **Use `uv build`** for development - it handles the shared library correctly
 2. **Build from `python/` directory** - it has the right context and config
 3. **Check imports after changes** - Python extensions need rebuilding after Rust changes
 4. **Use `cargo check`** for quick Rust-only validation
@@ -228,7 +226,7 @@ rm -rf python/claude_sdk/*.so
 rm -rf python/claude_sdk/*.pyi
 
 # Rebuild everything
-cd python && maturin develop
+uv build
 ```
 
 ### Environment Issues
@@ -242,7 +240,7 @@ pip list | grep claude
 
 # Reinstall if needed
 pip uninstall claude-sdk
-cd python && maturin develop
+uv build
 ```
 
 ## Development Memories
