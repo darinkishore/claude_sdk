@@ -5,6 +5,7 @@
 //! is now handled by Conversation.
 
 use std::path::PathBuf;
+use std::collections::HashMap;
 use crate::execution::{
     ClaudeExecutor, ExecutorError,
     EnvironmentObserver, EnvironmentSnapshot, ObserverError,
@@ -40,6 +41,12 @@ impl Workspace {
     /// Take a snapshot of the current workspace state
     pub fn snapshot(&self) -> Result<EnvironmentSnapshot, WorkspaceError> {
         self.observer.snapshot()
+            .map_err(WorkspaceError::ObserverError)
+    }
+
+    /// Capture only the workspace files without session data
+    pub fn snapshot_files(&self) -> Result<HashMap<PathBuf, String>, WorkspaceError> {
+        self.observer.snapshot_files()
             .map_err(WorkspaceError::ObserverError)
     }
     

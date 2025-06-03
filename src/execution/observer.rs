@@ -93,7 +93,7 @@ impl EnvironmentObserver {
         })
     }
     
-    fn snapshot_files(&self) -> Result<HashMap<PathBuf, String>, ObserverError> {
+    pub fn snapshot_files(&self) -> Result<HashMap<PathBuf, String>, ObserverError> {
         let mut files = HashMap::new();
         
         for pattern in &self.file_patterns {
