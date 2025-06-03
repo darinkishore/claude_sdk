@@ -4,6 +4,70 @@
 
 T1 extends the Claude SDK with execution and orchestration capabilities, building on top of the existing T0 parser infrastructure. This document provides detailed implementation specifications for each component.
 
+## Quick Usage Example
+
+```rust
+use claude_sdk::execution::ClaudeEnvironment;
+
+// Create environment for a workspace
+let mut env = ClaudeEnvironment::new(PathBuf::from("./my-project"))?;
+
+// Execute a fresh prompt
+let t1 = env.execute("Build a hello world function")?;
+
+// Continue the conversation
+let t2 = env.execute_with_options("Add error handling", true)?;
+
+// Access the data
+println!("Files created: {:?}", t2.after.files.keys());
+println!("Session messages: {}", t2.after.session.as_ref().unwrap().messages.len());
+
+// Query history
+let history = env.history(Some(10))?;
+```
+
+## 🚧 Missing Features (Priority Order)
+
+1. **Tool Call Extraction** - Parse tool executions from ParsedSession messages
+   - Extract from content blocks of type `tool_use` and `tool_result`
+   - Match tool calls with their results
+   - Currently have placeholder in `extract_tool_calls()`
+
+2. **Incremental Message Analysis** - Diff messages between before/after snapshots
+   - Identify which messages are "new" in a transition
+   - Enable analysis of just the incremental changes
+
+3. **Tool Permission Control** - ✅ ALREADY SUPPORTED BY CLAUDE CLI
+   - Use `--allowedTools` and `--disallowedTools` flags
+   - Examples: `--allowedTools "Read,Write"` or `--disallowedTools "Bash(rm -rf)"`
+   - Remove `--dangerously-skip-permissions` and use these flags instead
+
+## Key Implementation Discoveries
+
+### Session Behavior
+- Claude generates a **new session ID for every execution**, even with `--continue`
+- The `--continue` flag maintains conversation context but doesn't reuse session IDs
+- Each session's JSONL file contains the **full conversation history** when using `--continue`
+- JSONL files are written **immediately** (within microseconds) after execution
+
+### Path Encoding
+Claude encodes workspace paths for project directories with these rules:
+- `/` becomes `-`
+- `/.hidden` becomes `--hidden` (dot is removed, double dash added)
+- Example: `/Users/name/.claude-sdk/project` → `-Users-name--claude-sdk-project`
+
+### Design Decisions Made
+1. **Workspace-scoped transitions** - Stored in `workspace/.claude-sdk/transitions/`
+2. **Default to fresh sessions** - `execute()` uses `continue_session=false` by default
+3. **ParsedSession integration** - Snapshots parse JSONL files to include session data
+4. **Session ID-based lookup** - Can directly construct JSONL path from execution's session ID
+
+### Limitations (T1 Scope)
+- **No parallel execution** - Claude's `--continue` behavior with multiple concurrent sessions is undefined
+- **Single workspace** - Each ClaudeEnvironment instance is tied to one workspace
+- **No session management** - The SDK doesn't track which session to continue from
+- **Path handling** - Workspace paths should be canonical (absolute, resolved) for consistent project naming
+
 ## Core Components
 
 ### 1. ClaudeExecutor
@@ -147,12 +211,17 @@ use glob::glob;
 use crate::parser::SessionParser;
 use crate::types::ParsedSession;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EnvironmentSnapshot {
     pub files: HashMap<PathBuf, String>,
-    pub session: ParsedSession,
+    pub session_file: PathBuf,
     pub timestamp: DateTime<Utc>,
+    #[serde(skip)]
+    pub session: Option<ParsedSession>,  // Parsed on demand
 }
+
+// Note: We store session_file path for serialization, parse session on demand
+// This avoids serializing large ParsedSession objects in transitions
 
 pub struct EnvironmentObserver {
     workspace: PathBuf,
@@ -296,7 +365,8 @@ Stores transitions for learning and replay.
 
 #### Storage Format
 
-Transitions are stored as JSONL files in `.claude-sdk/transitions/` directory.
+Transitions are stored as JSONL files in `workspace/.claude-sdk/transitions/` directory.
+Each TransitionRecorder instance creates its own UUID-named JSONL file.
 
 ```rust
 // src/execution/recorder.rs

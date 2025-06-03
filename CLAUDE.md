@@ -2,6 +2,27 @@
 
 A Rust library with Python bindings for parsing and analyzing Claude Code session data.
 
+## Architecture Components
+
+### T0 - Session Parser (Complete)
+- Parses JSONL files from Claude sessions
+- Extracts messages, tool uses, and metadata
+- Builds conversation trees
+
+### T1 - Execution Engine (Complete)
+- Programmatic control over Claude CLI
+- Records transitions (before/after snapshots)
+- Extracts tool executions from sessions
+- Key components:
+  - `ClaudeExecutor`: Wraps Claude CLI
+  - `EnvironmentObserver`: Monitors workspace state
+  - `TransitionRecorder`: Records state transitions
+  - `ClaudeEnvironment`: High-level interface
+
+### T2 - Orchestration Layer (TODO)
+- Higher-level patterns: ReAct, HTN, reactive programming
+- Built on top of T1 primitives
+
 ## Quick Start
 
 ### Development Setup
@@ -111,6 +132,10 @@ import claude_sdk
 session = claude_sdk.load('path/to/session.jsonl')
 print(f'Loaded session with {len(session.messages)} messages')
 "
+
+# Run T1 tests (requires Claude CLI)
+cargo test --test t1_simple_tool_test -- --ignored --nocapture
+cargo test --test t1_tool_extraction_test -- --ignored --nocapture
 ```
 
 ## Development Workflow
@@ -248,4 +273,32 @@ cd python && maturin develop
 ## Development Memories
 
 - ALWAYS use uv run before typing python. it sets up the environment properly. Use `uv add` to add packages. 
-- Use uv build to build the project. 
+- Use uv build to build the project.
+
+## T1 Implementation Notes
+
+### Key Discoveries
+
+1. **Session IDs**: Each Claude execution creates a new session ID, even when using `--continue`
+2. **JSONL Timing**: JSONL files are written immediately after execution (microseconds)
+3. **Path Encoding**: Claude projects use special encoding for hidden directories: `/.hidden` → `--hidden`
+4. **Command Order**: The `-p` flag must come immediately before the prompt text
+5. **Permissions**: Use `--dangerously-skip-permissions` by default for programmatic usage
+
+### Session Tracking
+
+When not continuing a session, the "before" state should be empty:
+```rust
+let before = if continue_session {
+    self.observer.snapshot()?  // Get most recent session
+} else {
+    EnvironmentSnapshot {
+        files: self.observer.snapshot()?.files,
+        session_file: PathBuf::new(),
+        timestamp: chrono::Utc::now(),
+        session: None,  // No session to compare against
+    }
+};
+```
+
+This ensures new messages are properly detected when comparing states. 
