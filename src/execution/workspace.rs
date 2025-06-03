@@ -48,6 +48,22 @@ impl Workspace {
         self.observer.snapshot_with_session(session_id)
             .map_err(WorkspaceError::ObserverError)
     }
+    
+    /// Configure tool permissions for the executor
+    pub fn set_allowed_tools(&mut self, tools: Option<String>) {
+        self.executor.set_allowed_tools(tools);
+    }
+    
+    /// Configure disallowed tools for the executor
+    pub fn set_disallowed_tools(&mut self, tools: Option<String>) {
+        self.executor.set_disallowed_tools(tools);
+    }
+    
+    /// Enable dangerous mode that skips all permission checks
+    /// This should only be used in tests or when explicitly requested
+    pub fn set_skip_permissions(&mut self, skip: bool) {
+        self.executor.set_skip_permissions(skip);
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
