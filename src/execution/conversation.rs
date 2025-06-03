@@ -15,6 +15,15 @@ use super::{
     EnvironmentSnapshot, Transition,
 };
 
+/// Serializable representation of a Conversation
+#[derive(Debug, Serialize, Deserialize)]
+struct SavedConversation {
+    id: Uuid,
+    transitions: Vec<Transition>,
+    session_ids: Vec<String>,
+    metadata: ConversationMetadata,
+}
+
 /// A conversation with Claude that maintains its own history
 pub struct Conversation {
     /// Unique ID for this conversation
@@ -158,7 +167,13 @@ impl Conversation {
     
     /// Save conversation to disk
     pub fn save(&self, path: &std::path::Path) -> Result<(), ConversationError> {
-        let data = serde_json::to_string_pretty(self)?;
+        let saved = SavedConversation {
+            id: self.id,
+            transitions: self.transitions.clone(),
+            session_ids: self.session_ids.clone(),
+            metadata: self.metadata.clone(),
+        };
+        let data = serde_json::to_string_pretty(&saved)?;
         std::fs::write(path, data)?;
         Ok(())
     }
@@ -166,35 +181,15 @@ impl Conversation {
     /// Load conversation from disk
     pub fn load(path: &std::path::Path, workspace: Arc<Workspace>) -> Result<Self, ConversationError> {
         let data = std::fs::read_to_string(path)?;
-        let mut conv: Self = serde_json::from_str(&data)?;
-        conv.workspace = workspace;  // Update workspace reference
-        Ok(conv)
-    }
-}
-
-// Make Conversation serializable (excludes workspace Arc)
-impl Serialize for Conversation {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeStruct;
-        let mut state = serializer.serialize_struct("Conversation", 5)?;
-        state.serialize_field("id", &self.id)?;
-        state.serialize_field("transitions", &self.transitions)?;
-        state.serialize_field("session_ids", &self.session_ids)?;
-        state.serialize_field("metadata", &self.metadata)?;
-        state.end()
-    }
-}
-
-impl<'de> Deserialize<'de> for Conversation {
-    fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        // Placeholder - need workspace to properly deserialize
-        Err(serde::de::Error::custom("Use Conversation::load() instead"))
+        let saved: SavedConversation = serde_json::from_str(&data)?;
+        
+        Ok(Self {
+            id: saved.id,
+            workspace,
+            transitions: saved.transitions,
+            session_ids: saved.session_ids,
+            metadata: saved.metadata,
+        })
     }
 }
 
