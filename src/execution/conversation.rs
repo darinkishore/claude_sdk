@@ -3,11 +3,11 @@
 //! This is the new Conversation-centric design where each conversation
 //! maintains its own history of transitions.
 
-use std::sync::Arc;
-use std::path::PathBuf;
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
+use std::sync::Arc;
+use uuid::Uuid;
 
 use super::{
     Workspace, WorkspaceError,
@@ -24,25 +24,27 @@ struct SavedConversation {
     transitions: Vec<Transition>,
     session_ids: Vec<String>,
     metadata: ConversationMetadata,
+    #[serde(default)]
+    recording_enabled: bool,
 }
 
 /// A conversation with Claude that maintains its own history
 pub struct Conversation {
     /// Unique ID for this conversation
     id: Uuid,
-    
+
     /// The workspace where this conversation executes
     workspace: Arc<Workspace>,
-    
+
     /// All transitions in this conversation
     transitions: Vec<Transition>,
-    
+
     /// Chain of session IDs (Claude creates new ID per execution)
     session_ids: Vec<String>,
-    
+
     /// Metadata about the conversation
     metadata: ConversationMetadata,
-    
+
     /// Optional recorder for persisting transitions to disk
     recorder: Option<TransitionRecorder>,
 }
@@ -58,24 +60,21 @@ pub struct ConversationMetadata {
 impl Conversation {
     /// Create a new conversation in the given workspace
     pub fn new(workspace: Arc<Workspace>) -> Self {
-        Self::new_with_options(workspace, false)
+        Self::new_with_options(workspace, false).expect("record=false cannot fail")
     }
-    
+
     /// Create a new conversation with options
-    pub fn new_with_options(workspace: Arc<Workspace>, record: bool) -> Self {
+    pub fn new_with_options(
+        workspace: Arc<Workspace>,
+        record: bool,
+    ) -> Result<Self, ConversationError> {
         let recorder = if record {
-            match TransitionRecorder::new(workspace.path()) {
-                Ok(r) => Some(r),
-                Err(e) => {
-                    eprintln!("Warning: Failed to create transition recorder: {}", e);
-                    None
-                }
-            }
+            Some(TransitionRecorder::new(workspace.path())?)
         } else {
             None
         };
-        
-        Self {
+
+        Ok(Self {
             id: Uuid::new_v4(),
             workspace: workspace.clone(),
             transitions: Vec::new(),
@@ -87,9 +86,9 @@ impl Conversation {
                 total_messages: 0,
             },
             recorder,
-        }
+        })
     }
-    
+
     /// Send a message in this conversation
     pub fn send(&mut self, message: &str) -> Result<Transition, ConversationError> {
         // Capture before state
@@ -106,23 +105,25 @@ impl Conversation {
             // Continuing - snapshot current state
             self.workspace.snapshot()?
         };
-        
+
         // Build prompt with resume_session_id if continuing
         let prompt = ClaudePrompt {
             text: message.to_string(),
-            continue_session: false,  // Never use the ambiguous continue flag
+            continue_session: false, // Never use the ambiguous continue flag
             resume_session_id: self.session_ids.last().cloned(),
         };
-        
+
         // Execute via workspace
         let execution = self.workspace.executor.execute(prompt.clone())?;
-        
+
         // Small delay to let file system settle
         std::thread::sleep(std::time::Duration::from_millis(500));
-        
+
         // Capture after state with new session ID
-        let after = self.workspace.snapshot_with_session(&execution.session_id)?;
-        
+        let after = self
+            .workspace
+            .snapshot_with_session(&execution.session_id)?;
+
         // Create transition
         let transition = Transition {
             id: Uuid::new_v4(),
@@ -135,59 +136,64 @@ impl Conversation {
                 "conversation_id": self.id.to_string(),
             }),
         };
-        
+
         // Update conversation state
         self.session_ids.push(execution.session_id);
         self.metadata.total_cost_usd += execution.cost;
         self.metadata.total_messages += 1;
-        
+
         // Record if recorder is enabled
         if let Some(ref mut recorder) = self.recorder {
-            if let Err(e) = recorder.record(transition.clone()) {
+            if let Err(e) = recorder.record(&transition) {
                 eprintln!("Warning: Failed to record transition: {}", e);
             }
         }
-        
+
         // Store and return the transition
         self.transitions.push(transition.clone());
         Ok(transition)
     }
-    
+
     /// Get all transitions in this conversation
     pub fn history(&self) -> &[Transition] {
         &self.transitions
     }
-    
+
     /// Get the conversation ID
     pub fn id(&self) -> Uuid {
         self.id
     }
-    
+
     /// Get conversation metadata
     pub fn metadata(&self) -> &ConversationMetadata {
         &self.metadata
     }
-    
+
     /// Get all session IDs in order
     pub fn session_ids(&self) -> &[String] {
         &self.session_ids
     }
-    
+
     /// Get the most recent transition
     pub fn last_transition(&self) -> Option<&Transition> {
         self.transitions.last()
     }
-    
+
     /// Get total cost of the conversation
     pub fn total_cost(&self) -> f64 {
         self.metadata.total_cost_usd
     }
-    
+
+    /// Access the transition recorder if enabled
+    pub fn recorder(&self) -> Option<&TransitionRecorder> {
+        self.recorder.as_ref()
+    }
+
     /// Get tools used across all transitions
-    /// 
-    /// Note: This currently returns an empty vector because ParsedSession 
-    /// doesn't implement Clone, so session data is lost when transitions 
-    /// are stored. Tool extraction from transitions requires the parsed 
+    ///
+    /// Note: This currently returns an empty vector because ParsedSession
+    /// doesn't implement Clone, so session data is lost when transitions
+    /// are stored. Tool extraction from transitions requires the parsed
     /// session data which isn't preserved during cloning.
     pub fn tools_used(&self) -> Vec<String> {
         let mut tools = std::collections::HashSet::new();
@@ -201,7 +207,7 @@ impl Conversation {
         result.sort();
         result
     }
-    
+
     /// Save conversation to disk
     pub fn save(&self, path: &std::path::Path) -> Result<(), ConversationError> {
         let saved = SavedConversation {
@@ -209,24 +215,40 @@ impl Conversation {
             transitions: self.transitions.clone(),
             session_ids: self.session_ids.clone(),
             metadata: self.metadata.clone(),
+            recording_enabled: self.recorder.is_some(),
         };
         let data = serde_json::to_string_pretty(&saved)?;
         std::fs::write(path, data)?;
         Ok(())
     }
-    
+
     /// Load conversation from disk
-    pub fn load(path: &std::path::Path, workspace: Arc<Workspace>) -> Result<Self, ConversationError> {
+    pub fn load(
+        path: &std::path::Path,
+        workspace: Arc<Workspace>,
+        record: bool,
+    ) -> Result<Self, ConversationError> {
         let data = std::fs::read_to_string(path)?;
         let saved: SavedConversation = serde_json::from_str(&data)?;
-        
+
+        let record = if record {
+            true
+        } else {
+            saved.recording_enabled
+        };
+        let recorder = if record {
+            Some(TransitionRecorder::new(workspace.path())?)
+        } else {
+            None
+        };
+
         Ok(Self {
             id: saved.id,
             workspace,
             transitions: saved.transitions,
             session_ids: saved.session_ids,
             metadata: saved.metadata,
-            recorder: None,  // Recorder isn't persisted, create fresh if needed
+            recorder,
         })
     }
 }
@@ -235,19 +257,19 @@ impl Conversation {
 pub enum ConversationError {
     #[error("Workspace error: {0}")]
     WorkspaceError(#[from] WorkspaceError),
-    
+
     #[error("Executor error: {0}")]
     ExecutorError(#[from] super::ExecutorError),
-    
-    #[error("Observer error: {0}")]  
+
+    #[error("Observer error: {0}")]
     ObserverError(#[from] super::ObserverError),
-    
+
     #[error("Recorder error: {0}")]
     RecorderError(#[from] RecorderError),
-    
+
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),
-    
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 }
