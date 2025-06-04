@@ -8,9 +8,11 @@
 // 2. Mock the session file location (requires refactoring)
 // 3. Test only the file snapshot functionality
 
+mod common;
+
 use claude_sdk::execution::{EnvironmentObserver, ClaudeExecutor, ClaudePrompt};
 use std::path::PathBuf;
-use tempfile::TempDir;
+use crate::common::TestEnvironment;
 use std::fs;
 
 #[test]
@@ -19,8 +21,8 @@ fn test_environment_observer_file_snapshot_only() {
     // This test focuses on the file snapshot functionality
     // Testing session discovery is complex because Claude writes to ~/.claude/projects/
     
-    let temp_dir = TempDir::new().expect("Failed to create temp dir");
-    let workspace = temp_dir.path().to_path_buf();
+    let env = TestEnvironment::setup();
+    let workspace = env.workspace.clone();
     
     // Create test files
     fs::write(workspace.join("main.py"), "print('hello')").unwrap();
@@ -51,8 +53,8 @@ fn test_environment_observer_file_snapshot_only() {
 #[test]
 #[ignore]
 fn test_environment_observer_file_patterns() {
-    let temp_dir = TempDir::new().expect("Failed to create temp dir");
-    let workspace = temp_dir.path().to_path_buf();
+    let env = TestEnvironment::setup();
+    let workspace = env.workspace.clone();
     
     // Create various file types
     std::fs::write(workspace.join("script.py"), "# Python file").unwrap();
