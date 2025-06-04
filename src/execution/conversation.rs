@@ -192,11 +192,6 @@ impl Conversation {
     }
 
     /// Get tools used across all transitions
-    ///
-    /// Note: This currently returns an empty vector because ParsedSession
-    /// doesn't implement Clone, so session data is lost when transitions
-    /// are stored. Tool extraction from transitions requires the parsed
-    /// session data which isn't preserved during cloning.
     pub fn tools_used(&self) -> Vec<String> {
         let mut tools = std::collections::HashSet::new();
         for transition in &self.transitions {

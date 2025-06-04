@@ -12,7 +12,6 @@
 - ✅ Cost analysis and reporting
 
 ### Known Issues
-- 🐛 Tool extraction returns empty list (cloning bug)
 - 🐛 Tool-only responses show "(no content)"
 - 🐛 `--dangerously-skip-permissions` resets after Claude updates
 - 🐛 `ClaudeEnvironment.restore()` not implemented
