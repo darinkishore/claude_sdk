@@ -3,7 +3,7 @@
 //! This is the new Conversation-centric design where each conversation
 //! maintains its own history of transitions.
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
 use uuid::Uuid;
 use chrono::{DateTime, Utc};
@@ -31,7 +31,7 @@ pub struct Conversation {
     id: Uuid,
     
     /// The workspace where this conversation executes
-    workspace: Arc<Workspace>,
+    workspace: Arc<Mutex<Workspace>>,
     
     /// All transitions in this conversation
     transitions: Vec<Transition>,
@@ -56,14 +56,15 @@ pub struct ConversationMetadata {
 
 impl Conversation {
     /// Create a new conversation in the given workspace
-    pub fn new(workspace: Arc<Workspace>) -> Self {
+    pub fn new(workspace: Arc<Mutex<Workspace>>) -> Self {
         Self::new_with_options(workspace, false)
     }
     
     /// Create a new conversation with options
-    pub fn new_with_options(workspace: Arc<Workspace>, record: bool) -> Self {
+    pub fn new_with_options(workspace: Arc<Mutex<Workspace>>, record: bool) -> Self {
+        let ws_path = workspace.lock().unwrap().path().clone();
         let recorder = if record {
-            match TransitionRecorder::new(workspace.path()) {
+            match TransitionRecorder::new(&ws_path) {
                 Ok(r) => Some(r),
                 Err(e) => {
                     eprintln!("Warning: Failed to create transition recorder: {}", e);
@@ -73,7 +74,7 @@ impl Conversation {
         } else {
             None
         };
-        
+
         Self {
             id: Uuid::new_v4(),
             workspace: workspace.clone(),
@@ -81,7 +82,7 @@ impl Conversation {
             session_ids: Vec::new(),
             metadata: ConversationMetadata {
                 created_at: Utc::now(),
-                workspace_path: workspace.path().clone(),
+                workspace_path: ws_path,
                 total_cost_usd: 0.0,
                 total_messages: 0,
             },
@@ -95,7 +96,7 @@ impl Conversation {
         let before = if self.session_ids.is_empty() {
             // First message - no session to snapshot
             EnvironmentSnapshot {
-                files: self.workspace.snapshot_files()?,
+                files: self.workspace.lock().unwrap().snapshot_files()?,
                 session_file: PathBuf::new(),
                 session_id: None,
                 timestamp: Utc::now(),
@@ -103,7 +104,7 @@ impl Conversation {
             }
         } else {
             // Continuing - snapshot current state
-            self.workspace.snapshot()?
+            self.workspace.lock().unwrap().snapshot()?
         };
         
         // Build prompt with resume_session_id if continuing
@@ -114,13 +115,20 @@ impl Conversation {
         };
         
         // Execute via workspace
-        let execution = self.workspace.executor.execute(prompt.clone())?;
+        let execution = {
+            let ws = self.workspace.lock().unwrap();
+            ws.executor.execute(prompt.clone())?
+        };
         
         // Small delay to let file system settle
         std::thread::sleep(std::time::Duration::from_millis(500));
         
         // Capture after state with new session ID
-        let after = self.workspace.snapshot_with_session(&execution.session_id)?;
+        let after = self
+            .workspace
+            .lock()
+            .unwrap()
+            .snapshot_with_session(&execution.session_id)?;
         
         // Create transition
         let transition = Transition {
@@ -215,7 +223,7 @@ impl Conversation {
     }
     
     /// Load conversation from disk
-    pub fn load(path: &std::path::Path, workspace: Arc<Workspace>) -> Result<Self, ConversationError> {
+    pub fn load(path: &std::path::Path, workspace: Arc<Mutex<Workspace>>) -> Result<Self, ConversationError> {
         let data = std::fs::read_to_string(path)?;
         let saved: SavedConversation = serde_json::from_str(&data)?;
         

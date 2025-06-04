@@ -3,7 +3,7 @@
 
 mod common;
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use claude_sdk::execution::{Workspace, Conversation};
 use common::TestEnvironment;
 
@@ -13,11 +13,14 @@ fn test_disallow_specific_tools() {
     println!("\n=== Disallow Specific Tools Test ===\n");
     
     let env = TestEnvironment::setup();
-    let mut workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     
     // Test 1: Disallow Write but allow Read
     println!("1. Testing with Write disallowed...");
-    Arc::get_mut(&mut workspace).unwrap().set_disallowed_tools(Some("Write".to_string()));
+    {
+        let mut ws = workspace.lock().unwrap();
+        ws.set_disallowed_tools(Some("Write".to_string()));
+    }
     
     let mut conversation = Conversation::new(workspace.clone());
     let result = conversation.send(
@@ -56,8 +59,11 @@ fn test_disallow_specific_tools() {
     
     // Test 3: Disallow all file writing tools
     println!("\n3. Testing with all write tools disallowed...");
-    let mut workspace2 = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
-    Arc::get_mut(&mut workspace2).unwrap().set_disallowed_tools(Some("Write,MultiEdit,Edit".to_string()));
+    let workspace2 = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
+    {
+        let mut ws = workspace2.lock().unwrap();
+        ws.set_disallowed_tools(Some("Write,MultiEdit,Edit".to_string()));
+    }
     
     let mut conversation2 = Conversation::new(workspace2);
     let result3 = conversation2.send(
@@ -81,13 +87,14 @@ fn test_restricted_bash_commands() {
     println!("\n=== Restricted Bash Commands Test ===\n");
     
     let env = TestEnvironment::setup();
-    let mut workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     
     // Allow only specific bash commands
     println!("1. Testing with only ls and echo allowed for Bash...");
-    Arc::get_mut(&mut workspace).unwrap().set_allowed_tools(
-        Some("Bash(ls),Bash(echo),Read,Write".to_string())
-    );
+    {
+        let mut ws = workspace.lock().unwrap();
+        ws.set_allowed_tools(Some("Bash(ls),Bash(echo),Read,Write".to_string()));
+    }
     
     let mut conversation = Conversation::new(workspace.clone());
     

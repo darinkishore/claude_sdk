@@ -3,7 +3,7 @@
 
 mod common;
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use claude_sdk::execution::{Workspace, Conversation};
 use common::TestEnvironment;
 
@@ -13,7 +13,7 @@ fn test_tool_extraction() {
     println!("\n=== Tool Extraction Test ===\n");
     
     let env = TestEnvironment::setup();
-    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     let mut conversation = Conversation::new(workspace);
     
     // Execute a prompt that will use multiple tools
