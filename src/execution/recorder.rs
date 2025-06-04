@@ -130,12 +130,7 @@ impl TransitionRecorder {
         })
     }
     
-    pub fn record(&mut self, mut transition: Transition) -> Result<(), RecorderError> {
-        // Only set ID if not already set
-        if transition.id == Uuid::nil() {
-            transition.id = Uuid::new_v4();
-        }
-        transition.recorded_at = Utc::now();
+    pub fn record(&mut self, transition: &Transition) -> Result<(), RecorderError> {
         
         let json = serde_json::to_string(&transition)
             .map_err(|e| RecorderError::SerializeError(e.to_string()))?;

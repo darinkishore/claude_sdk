@@ -141,7 +141,7 @@ impl Conversation {
 
         // Record if recorder is enabled
         if let Some(ref mut recorder) = self.recorder {
-            if let Err(e) = recorder.record(transition.clone()) {
+            if let Err(e) = recorder.record(&transition) {
                 eprintln!("Warning: Failed to record transition: {}", e);
             }
         }
