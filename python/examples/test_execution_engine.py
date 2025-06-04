@@ -5,7 +5,13 @@ import claude_sdk
 import tempfile
 import os
 from pathlib import Path
+import shutil
+import pytest
 
+
+CLAUDE_AVAILABLE = shutil.which("claude") is not None
+
+@pytest.mark.skipif(not CLAUDE_AVAILABLE, reason="Claude CLI not installed")
 def test_basic_execution():
     """Test basic workspace and conversation functionality."""
     # Create a temporary directory for testing
@@ -48,6 +54,7 @@ def test_basic_execution():
         except Exception as e:
             print(f"⚠️  Save failed (expected with no transitions): {e}")
 
+@pytest.mark.skipif(not CLAUDE_AVAILABLE, reason="Claude CLI not installed")
 def test_environment_snapshot():
     """Test environment snapshot functionality."""
     print("\n--- Testing Environment Snapshot ---")
