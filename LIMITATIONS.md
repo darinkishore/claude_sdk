@@ -6,25 +6,10 @@ This document tracks known limitations, caveats, and design decisions in the Cla
 
 ### 1. Tool Extraction from Cloned Transitions
 
-**Issue**: `conversation.tools_used()` returns an empty vector.
-
-**Cause**: 
-- `ParsedSession` doesn't implement `Clone`
-- When transitions are stored in conversations, they're cloned
-- Cloning sets `session: None` to avoid expensive deep copies
-- Without session data, tool extraction fails
-
-**Workaround**: Extract tools directly from transitions before they're cloned:
-```rust
-// Works - direct access to transition
-let transition = env.execute("Create a file")?;
-let tools = transition.tool_executions(); // ✓ Works
-
-// Doesn't work - after storing in conversation
-let tools = conversation.tools_used(); // ✗ Returns empty
-```
-
-**Status**: Accepted limitation. May revisit if it becomes a user issue.
+This limitation has been resolved. `EnvironmentSnapshot` now stores the parsed
+session inside an `Arc`, allowing transitions (and conversations) to be cloned
+without losing session data. Tool extraction works correctly on stored
+transitions and conversations.
 
 ### 2. No Parallel Execution Support
 

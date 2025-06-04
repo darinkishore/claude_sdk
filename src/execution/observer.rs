@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
+use std::sync::Arc;
 use glob::glob;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
@@ -8,27 +9,13 @@ use crate::types::ParsedSession;
 use crate::utils::path::encode_project_path;
 
 // Keep the path-based snapshot for serialization
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnvironmentSnapshot {
     pub files: HashMap<PathBuf, String>,
     pub session_file: PathBuf,  // Store path for serialization
     pub timestamp: DateTime<Utc>,
     #[serde(skip)]  // Don't serialize the parsed session
-    pub session: Option<ParsedSession>,  // Parsed on demand
-}
-
-// Manual Clone implementation
-// Note: session is not cloned because ParsedSession doesn't implement Clone
-// This means cloned snapshots lose their parsed session data
-impl Clone for EnvironmentSnapshot {
-    fn clone(&self) -> Self {
-        Self {
-            files: self.files.clone(),
-            session_file: self.session_file.clone(),
-            timestamp: self.timestamp,
-            session: None,  // Can't clone ParsedSession - would need to re-parse from file
-        }
-    }
+    pub session: Option<Arc<ParsedSession>>,  // Parsed on demand
 }
 
 pub struct EnvironmentObserver {
@@ -66,7 +53,8 @@ impl EnvironmentObserver {
         let parser = SessionParser::new(&session_file);
         let session = parser.parse()
             .map_err(|e| ObserverError::ParseError(format!("Failed to parse session: {}", e)))
-            .ok();  // Make it optional in case parsing fails
+            .ok()
+            .map(Arc::new);  // Make it optional and wrap in Arc
         
         Ok(EnvironmentSnapshot {
             files,
@@ -83,7 +71,7 @@ impl EnvironmentObserver {
         
         // Parse the session
         let parser = SessionParser::new(&session_file);
-        let session = parser.parse().ok();
+        let session = parser.parse().ok().map(Arc::new);
         
         Ok(EnvironmentSnapshot {
             files,

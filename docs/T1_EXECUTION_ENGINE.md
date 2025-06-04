@@ -210,14 +210,15 @@ use std::collections::HashMap;
 use glob::glob;
 use crate::parser::SessionParser;
 use crate::types::ParsedSession;
+use std::sync::Arc;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnvironmentSnapshot {
     pub files: HashMap<PathBuf, String>,
     pub session_file: PathBuf,
     pub timestamp: DateTime<Utc>,
     #[serde(skip)]
-    pub session: Option<ParsedSession>,  // Parsed on demand
+    pub session: Option<Arc<ParsedSession>>,  // Parsed on demand
 }
 
 // Note: We store session_file path for serialization, parse session on demand

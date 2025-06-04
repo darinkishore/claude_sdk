@@ -83,5 +83,5 @@ fn test_tool_extraction() {
 }
 
 // Removed test_conversation_level_tool_extraction
-// Tool extraction from conversations doesn't work due to ParsedSession cloning issue
-// See LIMITATIONS.md for details
+// Previously tool extraction failed on stored conversations due to missing session data.
+// This has been resolved with `Arc<ParsedSession>` snapshots.
