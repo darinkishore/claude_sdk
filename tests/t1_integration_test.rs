@@ -2,16 +2,18 @@
 // Requires Claude CLI to be installed
 // Run with: cargo test --test t1_integration_test -- --ignored --nocapture
 
+mod common;
+
 mod executor_integration_tests {
     use claude_sdk::execution::{ClaudeExecutor, ClaudePrompt};
-    use tempfile::TempDir;
+    use crate::common::TestEnvironment;
 
     #[test]
     #[ignore] // Run with: cargo test --test t1_integration_test -- --ignored
     fn test_claude_executor_basic_prompt() {
-        // Create a temporary directory for the test
-        let temp_dir = TempDir::new().expect("Failed to create temp dir");
-        let workspace = temp_dir.path().to_path_buf();
+        // Use fixed test environment
+        let env = TestEnvironment::setup();
+        let workspace = env.workspace.clone();
         
         // Create executor
         let executor = ClaudeExecutor::new(workspace.clone())
@@ -67,8 +69,8 @@ mod executor_integration_tests {
     #[test]
     #[ignore]
     fn test_claude_executor_continue_session() {
-        let temp_dir = TempDir::new().expect("Failed to create temp dir");
-        let workspace = temp_dir.path().to_path_buf();
+        let env = TestEnvironment::setup();
+        let workspace = env.workspace.clone();
         
         let executor = ClaudeExecutor::new(workspace.clone())
             .expect("Failed to create ClaudeExecutor");

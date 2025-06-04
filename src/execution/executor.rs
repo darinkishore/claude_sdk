@@ -84,6 +84,9 @@ impl ClaudeExecutor {
         // Add flags (order matters for some)
         cmd.arg("--output-format").arg("json");
         
+        // Hardcode sonnet model for now (TODO: make configurable)
+        cmd.arg("--model").arg("claude-sonnet-4-20250514");
+        
         // Session management
         if let Some(ref session_id) = prompt.resume_session_id {
             cmd.arg("--resume").arg(session_id);

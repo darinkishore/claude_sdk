@@ -1,16 +1,18 @@
 // Test tool permission configuration
 // Run with: cargo test --test t1_tool_permissions_test -- --ignored --nocapture
 
+mod common;
+
 use claude_sdk::execution::{ClaudeExecutor, ClaudePrompt};
-use tempfile::TempDir;
+use crate::common::TestEnvironment;
 
 #[test]
 #[ignore]
 fn test_tool_permissions() {
     println!("\n=== Tool Permissions Test ===\n");
     
-    let temp_dir = TempDir::new().unwrap();
-    let workspace = temp_dir.path().to_path_buf();
+    let env = TestEnvironment::setup();
+    let workspace = env.workspace.clone();
     
     // Test 1: Default behavior (standard Claude Code tools)
     println!("1. Testing default permissions (standard Claude Code tools)...");
