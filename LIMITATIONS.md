@@ -4,27 +4,11 @@ This document tracks known limitations, caveats, and design decisions in the Cla
 
 ## T1 Execution Engine Limitations
 
-### 1. Tool Extraction from Cloned Transitions
+### 1. ~~Tool Extraction from Cloned Transitions~~ (Fixed)
 
-**Issue**: `conversation.tools_used()` returns an empty vector.
+**Update**: This issue has been resolved by using `Arc<ParsedSession>` to share session data between clones.
 
-**Cause**: 
-- `ParsedSession` doesn't implement `Clone`
-- When transitions are stored in conversations, they're cloned
-- Cloning sets `session: None` to avoid expensive deep copies
-- Without session data, tool extraction fails
-
-**Workaround**: Extract tools directly from transitions before they're cloned:
-```rust
-// Works - direct access to transition
-let transition = env.execute("Create a file")?;
-let tools = transition.tool_executions(); // ✓ Works
-
-// Doesn't work - after storing in conversation
-let tools = conversation.tools_used(); // ✗ Returns empty
-```
-
-**Status**: Accepted limitation. May revisit if it becomes a user issue.
+Tool extraction now works correctly on both direct transitions and stored conversations.
 
 ### 2. No Parallel Execution Support
 
