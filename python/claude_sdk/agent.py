@@ -113,14 +113,14 @@ class ClaudeAgent:
         self, 
         workspace: Union[str, Path], 
         auto_continue: bool = True,
-        record_transitions: bool = False
+        record_transitions: bool = True
     ):
         """Initialize a Claude agent.
         
         Args:
             workspace: Path to the workspace directory
             auto_continue: Whether to automatically continue conversations (default: True)
-            record_transitions: Whether to persist transitions to disk (default: False)
+            record_transitions: Whether to persist transitions to disk (default: True)
         """
         self.workspace = Workspace(str(workspace))
         self.conversation = Conversation(self.workspace, record=record_transitions)
@@ -185,10 +185,11 @@ class ClaudeAgent:
     
     @classmethod
     def load_conversation(
-        cls, 
-        path: Union[str, Path], 
+        cls,
+        path: Union[str, Path],
         workspace: Union[str, Path],
-        auto_continue: bool = True
+        auto_continue: bool = True,
+        record_transitions: bool = True
     ) -> 'ClaudeAgent':
         """Load a conversation from disk.
         
@@ -196,12 +197,13 @@ class ClaudeAgent:
             path: Path to the saved conversation
             workspace: Workspace path (must match the original)
             auto_continue: Whether to auto-continue loaded conversation
+            record_transitions: Enable recording for the loaded conversation
             
         Returns:
             ClaudeAgent with the loaded conversation
         """
         workspace_obj = Workspace(str(workspace))
-        conversation = Conversation.load(str(path), workspace_obj)
+        conversation = Conversation.load(str(path), workspace_obj, record=record_transitions)
         
         agent = cls.__new__(cls)
         agent.workspace = workspace_obj

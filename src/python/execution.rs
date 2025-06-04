@@ -1,15 +1,12 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
-use std::sync::Arc;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use crate::execution::{
-    Workspace as RustWorkspace,
-    Conversation as RustConversation,
-    Transition as RustTransition,
-    ClaudePrompt as RustClaudePrompt,
-    ClaudeExecution as RustClaudeExecution,
-    EnvironmentSnapshot as RustEnvironmentSnapshot,
+    ClaudeExecution as RustClaudeExecution, ClaudePrompt as RustClaudePrompt,
+    Conversation as RustConversation, EnvironmentSnapshot as RustEnvironmentSnapshot,
+    Transition as RustTransition, Workspace as RustWorkspace,
 };
 
 /// Python wrapper for Workspace
@@ -28,30 +25,34 @@ impl PyWorkspace {
             inner: Arc::new(workspace),
         })
     }
-    
+
     #[getter]
     fn path(&self) -> String {
         self.inner.path().display().to_string()
     }
-    
+
     fn snapshot(&self) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self.inner.snapshot()
+        let snapshot = self
+            .inner
+            .snapshot()
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
-    
+
     fn snapshot_with_session(&self, session_id: &str) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self.inner.snapshot_with_session(session_id)
+        let snapshot = self
+            .inner
+            .snapshot_with_session(session_id)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
-    
+
     fn set_skip_permissions(&self, skip: bool) -> PyResult<()> {
         // We need mutable access to workspace, but PyWorkspace holds Arc<RustWorkspace>
         // This is a limitation of the current design - we'd need Arc<Mutex<RustWorkspace>>
         // For now, let's document this limitation
         Err(PyErr::new::<pyo3::exceptions::PyNotImplementedError, _>(
-            "set_skip_permissions not yet implemented due to Arc wrapper"
+            "set_skip_permissions not yet implemented due to Arc wrapper",
         ))
     }
 }
@@ -65,63 +66,75 @@ pub struct PyConversation {
 #[pymethods]
 impl PyConversation {
     #[new]
-    #[pyo3(signature = (workspace, record=false))]
-    fn new(workspace: &PyWorkspace, record: bool) -> Self {
+    #[pyo3(signature = (workspace, record=true))]
+    fn new(workspace: &PyWorkspace, record: bool) -> PyResult<Self> {
         let conversation = if record {
             RustConversation::new_with_options(workspace.inner.clone(), true)
+                .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?
         } else {
             RustConversation::new(workspace.inner.clone())
         };
-        Self { inner: conversation }
+        Ok(Self {
+            inner: conversation,
+        })
     }
-    
+
     fn send(&mut self, message: &str) -> PyResult<PyTransition> {
-        let transition = self.inner.send(message)
+        let transition = self
+            .inner
+            .send(message)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyTransition { inner: transition })
     }
-    
+
     fn history(&self) -> Vec<PyTransition> {
-        self.inner.history()
+        self.inner
+            .history()
             .iter()
             .map(|t| PyTransition { inner: t.clone() })
             .collect()
     }
-    
+
     #[getter]
     fn id(&self) -> String {
         self.inner.id().to_string()
     }
-    
+
     #[getter]
     fn session_ids(&self) -> Vec<String> {
         self.inner.session_ids().to_vec()
     }
-    
+
     #[getter]
     fn total_cost(&self) -> f64 {
         self.inner.total_cost()
     }
-    
+
     fn last_transition(&self) -> Option<PyTransition> {
-        self.inner.last_transition()
+        self.inner
+            .last_transition()
             .map(|t| PyTransition { inner: t.clone() })
     }
-    
+
     fn tools_used(&self) -> Vec<String> {
         self.inner.tools_used()
     }
-    
+
     fn save(&self, path: &str) -> PyResult<()> {
-        self.inner.save(&PathBuf::from(path))
+        self.inner
+            .save(&PathBuf::from(path))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))
     }
-    
+
     #[staticmethod]
-    fn load(path: &str, workspace: &PyWorkspace) -> PyResult<Self> {
-        let conversation = RustConversation::load(&PathBuf::from(path), workspace.inner.clone())
-            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
-        Ok(Self { inner: conversation })
+    #[pyo3(signature = (path, workspace, record=true))]
+    fn load(path: &str, workspace: &PyWorkspace, record: bool) -> PyResult<Self> {
+        let conversation =
+            RustConversation::load(&PathBuf::from(path), workspace.inner.clone(), record)
+                .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
+        Ok(Self {
+            inner: conversation,
+        })
     }
 }
 
@@ -138,40 +151,40 @@ impl PyTransition {
     fn id(&self) -> String {
         self.inner.id.to_string()
     }
-    
+
     #[getter]
     fn before(&self) -> PyEnvironmentSnapshot {
         PyEnvironmentSnapshot {
             inner: self.inner.before.clone(),
         }
     }
-    
+
     #[getter]
     fn after(&self) -> PyEnvironmentSnapshot {
         PyEnvironmentSnapshot {
             inner: self.inner.after.clone(),
         }
     }
-    
+
     #[getter]
     fn prompt(&self) -> PyClaudePrompt {
         PyClaudePrompt {
             inner: self.inner.prompt.clone(),
         }
     }
-    
+
     #[getter]
     fn execution(&self) -> PyClaudeExecution {
         PyClaudeExecution {
             inner: self.inner.execution.clone(),
         }
     }
-    
+
     #[getter]
     fn recorded_at(&self) -> String {
         self.inner.recorded_at.to_rfc3339()
     }
-    
+
     fn new_messages(&self) -> PyResult<Py<PyAny>> {
         Python::with_gil(|py| {
             let messages = self.inner.new_messages();
@@ -188,11 +201,11 @@ impl PyTransition {
             Ok(py_list.into())
         })
     }
-    
+
     fn tools_used(&self) -> Vec<String> {
         self.inner.tools_used()
     }
-    
+
     fn has_tool_errors(&self) -> bool {
         self.inner.has_tool_errors()
     }
@@ -217,12 +230,12 @@ impl PyClaudePrompt {
         };
         Self { inner: prompt }
     }
-    
+
     #[getter]
     fn text(&self) -> &str {
         &self.inner.text
     }
-    
+
     #[getter]
     fn resume_session_id(&self) -> Option<String> {
         self.inner.resume_session_id.clone()
@@ -242,17 +255,17 @@ impl PyClaudeExecution {
     fn session_id(&self) -> &str {
         &self.inner.session_id
     }
-    
+
     #[getter]
     fn response(&self) -> &str {
         &self.inner.response
     }
-    
+
     #[getter]
     fn cost(&self) -> f64 {
         self.inner.cost
     }
-    
+
     #[getter]
     fn duration_ms(&self) -> u64 {
         self.inner.duration_ms
@@ -278,17 +291,17 @@ impl PyEnvironmentSnapshot {
             Ok(dict.into())
         })
     }
-    
+
     #[getter]
     fn session_file(&self) -> String {
         self.inner.session_file.display().to_string()
     }
-    
+
     #[getter]
     fn session_id(&self) -> Option<String> {
         self.inner.session_id.clone()
     }
-    
+
     #[getter]
     fn timestamp(&self) -> String {
         self.inner.timestamp.to_rfc3339()
