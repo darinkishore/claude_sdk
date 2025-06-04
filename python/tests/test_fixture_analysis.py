@@ -5,7 +5,13 @@ import json
 from pathlib import Path
 from collections import Counter
 
-FIXTURE_PATH = Path(__file__).parent.parent.parent / "tests" / "db68d083-0471-4213-8609-356b0bf38fec.jsonl"
+FIXTURE_PATH = (
+    Path(__file__).parent.parent.parent
+    / "tests"
+    / "fixtures"
+    / "sessions"
+    / "swe_fixer_download_debug.jsonl"
+)
 
 def analyze_fixture():
     with open(FIXTURE_PATH) as f:

@@ -5,7 +5,6 @@ use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 use crate::execution::{ClaudePrompt, ClaudeExecution, EnvironmentSnapshot};
-use std::sync::Arc;
 use crate::types::{MessageRecord, ContentBlock, ToolExecution, ToolResult as TypesToolResult};
 use std::time::Duration;
 

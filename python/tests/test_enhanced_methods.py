@@ -7,8 +7,14 @@ import pytest
 from pathlib import Path
 import claude_sdk
 
-# Use the real fixture file from the Rust tests directory
-FIXTURE_PATH = Path(__file__).parent.parent.parent / "tests" / "db68d083-0471-4213-8609-356b0bf38fec.jsonl"
+# Use the fixture bundled with the Rust tests
+FIXTURE_PATH = (
+    Path(__file__).parent.parent.parent
+    / "tests"
+    / "fixtures"
+    / "sessions"
+    / "swe_fixer_download_debug.jsonl"
+)
 
 
 class TestCurrentMethods:
