@@ -3,6 +3,11 @@ use std::collections::HashMap;
 use glob::glob;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+
+/// Sentinel session ID used before any conversation has started.
+pub const PRE_CONVERSATION_SESSION_ID: &str = "\u{2205}"; // "∅"
+/// Sentinel path for the non-existent session file before first turn.
+pub const NO_SESSION_FILE: &str = "<none>";
 use crate::parser::SessionParser;
 use crate::types::ParsedSession;
 use crate::utils::path::encode_project_path;

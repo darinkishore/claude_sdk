@@ -10,8 +10,11 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 use super::{
-    recorder::{RecorderError, TransitionRecorder},
-    ClaudePrompt, EnvironmentSnapshot, Transition, Workspace, WorkspaceError,
+    Workspace, WorkspaceError,
+    ClaudePrompt,
+    EnvironmentSnapshot, Transition,
+    recorder::{TransitionRecorder, RecorderError},
+    observer::{PRE_CONVERSATION_SESSION_ID, NO_SESSION_FILE},
 };
 
 /// Serializable representation of a Conversation
@@ -93,8 +96,8 @@ impl Conversation {
             // First message - no session to snapshot
             EnvironmentSnapshot {
                 files: self.workspace.snapshot_files()?,
-                session_file: PathBuf::new(),
-                session_id: None,
+                session_file: PathBuf::from(NO_SESSION_FILE),
+                session_id: Some(PRE_CONVERSATION_SESSION_ID.to_string()),
                 timestamp: Utc::now(),
                 session: None,
             }

@@ -343,16 +343,22 @@ When not continuing a session, the "before" state should be empty:
 let before = if continue_session {
     self.observer.snapshot()?  // Get most recent session
 } else {
-    EnvironmentSnapshot {
-        files: self.observer.snapshot()?.files,
-        session_file: PathBuf::new(),
-        timestamp: chrono::Utc::now(),
-        session: None,  // No session to compare against
-    }
+        EnvironmentSnapshot {
+            files: self.observer.snapshot()?.files,
+            session_file: PathBuf::from(NO_SESSION_FILE),
+            session_id: Some(PRE_CONVERSATION_SESSION_ID.to_string()),
+            timestamp: chrono::Utc::now(),
+            session: None,  // No session to compare against
+        }
 };
 ```
 
 This ensures new messages are properly detected when comparing states.
+
+The sentinel `session_id` for this empty snapshot is stored in
+`PRE_CONVERSATION_SESSION_ID` (`"\u2205"`), and the corresponding
+`session_file` is the string `NO_SESSION_FILE` (`"<none>"`).  Downstream tools
+should treat these values as indicators that no prior session exists.
 
 ### TODO: API Improvements
 
