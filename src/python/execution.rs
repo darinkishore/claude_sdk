@@ -1,7 +1,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
+
 
 use crate::execution::{
     Workspace as RustWorkspace,
@@ -15,7 +16,7 @@ use crate::execution::{
 /// Python wrapper for Workspace
 #[pyclass(name = "Workspace")]
 pub struct PyWorkspace {
-    inner: Arc<RustWorkspace>,
+    inner: Arc<Mutex<RustWorkspace>>,
 }
 
 #[pymethods]
@@ -25,34 +26,48 @@ impl PyWorkspace {
         let workspace = RustWorkspace::new(PathBuf::from(path))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(Self {
-            inner: Arc::new(workspace),
+            inner: Arc::new(Mutex::new(workspace)),
         })
     }
     
     #[getter]
     fn path(&self) -> String {
-        self.inner.path().display().to_string()
+        self
+            .inner
+            .lock()
+            .unwrap()
+            .path()
+            .display()
+            .to_string()
     }
     
     fn snapshot(&self) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self.inner.snapshot()
+        let snapshot = self
+            .inner
+            .lock()
+            .unwrap()
+            .snapshot()
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
-    
+
     fn snapshot_with_session(&self, session_id: &str) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self.inner.snapshot_with_session(session_id)
+        let snapshot = self
+            .inner
+            .lock()
+            .unwrap()
+            .snapshot_with_session(session_id)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
     
     fn set_skip_permissions(&self, skip: bool) -> PyResult<()> {
-        // We need mutable access to workspace, but PyWorkspace holds Arc<RustWorkspace>
-        // This is a limitation of the current design - we'd need Arc<Mutex<RustWorkspace>>
-        // For now, let's document this limitation
-        Err(PyErr::new::<pyo3::exceptions::PyNotImplementedError, _>(
-            "set_skip_permissions not yet implemented due to Arc wrapper"
-        ))
+        let mut ws = self
+            .inner
+            .lock()
+            .map_err(|_| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>("Workspace mutex poisoned"))?;
+        ws.set_skip_permissions(skip);
+        Ok(())
     }
 }
 

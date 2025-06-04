@@ -3,7 +3,7 @@
 
 mod common;
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use claude_sdk::execution::{Workspace, Conversation};
 use common::TestEnvironment;
 
@@ -13,7 +13,7 @@ fn test_conversation_owns_transitions() {
     println!("\n=== Conversation V2 Test ===\n");
     
     let env = TestEnvironment::setup();
-    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     
     // Create a conversation
     let mut conversation = Conversation::new(workspace.clone());
@@ -65,7 +65,7 @@ fn test_multiple_conversations_same_workspace() {
     println!("\n=== Multiple Conversations Test ===\n");
     
     let env = TestEnvironment::setup();
-    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     
     // Create two conversations in same workspace
     let mut conv1 = Conversation::new(workspace.clone());
@@ -104,7 +104,7 @@ fn test_conversation_persistence() {
     println!("\n=== Conversation Persistence Test ===\n");
     
     let env = TestEnvironment::setup();
-    let workspace = Arc::new(Workspace::new(env.workspace.clone()).unwrap());
+    let workspace = Arc::new(Mutex::new(Workspace::new(env.workspace.clone()).unwrap()));
     
     let conv_id;
     let save_path = env.workspace.join("conversation.json");
