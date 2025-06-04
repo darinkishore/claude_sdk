@@ -142,16 +142,18 @@ impl Conversation {
         self.metadata.total_cost_usd += execution.cost;
         self.metadata.total_messages += 1;
 
-        // Record if recorder is enabled
+        // Record if recorder is enabled (must happen before move)
         if let Some(ref mut recorder) = self.recorder {
             if let Err(e) = recorder.record(&transition) {
                 eprintln!("Warning: Failed to record transition: {}", e);
             }
         }
 
-        // Store and return the transition
-        self.transitions.push(transition.clone());
-        Ok(transition)
+        // Store the transition (move, don't clone, to preserve session data)
+        self.transitions.push(transition);
+        
+        // Return a reference to the stored transition
+        Ok(self.transitions.last().unwrap().clone())
     }
 
     /// Get all transitions in this conversation
