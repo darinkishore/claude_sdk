@@ -121,7 +121,7 @@ fn sample_transition() -> Transition {
         session_file: PathBuf::from("before.jsonl"),
         session_id: Some("sess1".to_string()),
         timestamp: now,
-        session: Some(before_session),
+        session: Some(before_session.into()),
     };
 
     let after = EnvironmentSnapshot {
@@ -129,7 +129,7 @@ fn sample_transition() -> Transition {
         session_file: PathBuf::from("after.jsonl"),
         session_id: Some("sess1".to_string()),
         timestamp: now + chrono::Duration::milliseconds(2),
-        session: Some(after_session),
+        session: Some(after_session.into()),
     };
 
     let prompt = ClaudePrompt { text: "test".to_string(), continue_session: false, resume_session_id: None };

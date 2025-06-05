@@ -5,24 +5,13 @@ use claude_sdk::execution::recorder::Transition;
 use uuid::Uuid;
 use std::collections::HashMap;
 use chrono::Utc;
-use tempfile::NamedTempFile;
-use std::io::Write;
+use std::path::Path;
 
 #[test]
 fn test_transition_tool_extraction() {
-    // Load fixture lines
-    let data = std::fs::read_to_string("tests/fixtures/example_sample.jsonl")
-        .expect("read fixture");
-    let mut lines = data.lines();
-    let line1 = lines.next().unwrap();
-    let line2 = lines.next().unwrap();
-
-    // Write both lines to temp file to represent the first execution
-    let mut file_after = NamedTempFile::new().unwrap();
-    writeln!(file_after, "{}", line1).unwrap();
-    writeln!(file_after, "{}", line2).unwrap();
-    file_after.flush().unwrap();
-    let parser_after = SessionParser::new(file_after.path());
+    // Load after fixture representing the first execution
+    let after_path = Path::new("tests/fixtures/transitions/after_example.jsonl");
+    let parser_after = SessionParser::new(after_path);
     let after_session = parser_after.parse().unwrap();
 
     // Build snapshots representing the first execution
@@ -35,10 +24,10 @@ fn test_transition_tool_extraction() {
     };
     let after_snap = EnvironmentSnapshot {
         files: HashMap::new(),
-        session_file: file_after.path().to_path_buf(),
+        session_file: after_path.to_path_buf(),
         session_id: Some(after_session.session_id.clone()),
         timestamp: Utc::now(),
-        session: Some(after_session),
+        session: Some(std::sync::Arc::new(after_session)),
     };
 
     // Dummy execution info

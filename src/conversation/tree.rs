@@ -5,7 +5,7 @@ use crate::types::MessageRecord;
 use crate::error::ParseError;
 
 /// Represents a conversation as a tree structure
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConversationTree {
     /// Root messages (no parent)
     pub root_messages: Vec<ConversationNode>,
@@ -16,7 +16,7 @@ pub struct ConversationTree {
 }
 
 /// A node in the conversation tree
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConversationNode {
     pub message: MessageRecord,
     pub children: Vec<ConversationNode>,
