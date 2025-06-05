@@ -5,7 +5,7 @@ from typing import Optional, List, Union
 from dataclasses import dataclass
 from datetime import datetime
 
-from . import Workspace, Conversation, Transition
+from . import Workspace, Conversation, Transition, Message, Session
 
 
 @dataclass
@@ -75,6 +75,20 @@ class AgentResponse:
     def has_errors(self) -> bool:
         """Whether any tools had errors."""
         return self._transition.has_tool_errors()
+    
+    @property
+    def messages(self) -> List[Message]:
+        """Fully-typed Claude messages added in this turn.
+        
+        The list preserves Claude's internal order:
+        [user_msg, assistant_thinking?, assistant_reply, ...]
+        """
+        return self._transition.new_messages()
+    
+    @property
+    def session_after(self) -> Optional[Session]:
+        """Complete Claude session state after this turn."""
+        return self._transition.session_after
     
     @property
     def transition(self) -> Transition:

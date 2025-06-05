@@ -196,8 +196,8 @@ impl PyTransition {
     }
 
     fn new_messages(&self) -> Vec<crate::python::classes::Message> {
-        self
-            .inner
+        // Each MessageRecord -> fully-typed Message
+        self.inner
             .new_messages()
             .into_iter()
             .map(crate::python::classes::Message::from_rust_message)
