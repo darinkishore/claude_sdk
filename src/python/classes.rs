@@ -69,6 +69,10 @@ pub struct Message {
     pub input_tokens: Option<u32>,
     #[pyo3(get)]
     pub output_tokens: Option<u32>,
+    #[pyo3(get)]
+    pub tool_uses: Vec<crate::python::models::ToolUseBlock>,
+    #[pyo3(get)]
+    pub tool_results: Vec<crate::python::models::ToolResultBlock>,
     // Store the raw content for get_tool_blocks
     content_blocks: Vec<ContentBlock>,
 }
@@ -142,16 +146,46 @@ impl Message {
         // Extract text content and tools
         let mut text_parts = Vec::new();
         let mut tools = Vec::new();
+        let mut tool_uses_vec = Vec::new();
+        let mut tool_results_vec = Vec::new();
         
         for content in &msg.message.content {
             match content {
                 ContentBlock::Text { text } => {
                     text_parts.push(text.clone());
                 }
-                ContentBlock::ToolUse { name, .. } => {
-                    tools.push(name.clone());
+                ContentBlock::Thinking { thinking, .. } => {
+                    text_parts.push(thinking.clone());
                 }
-                _ => {}
+                ContentBlock::ToolUse { id, name, input } => {
+                    tools.push(name.clone());
+                    tool_uses_vec.push(ToolUseBlock::from_content_block(
+                        id.clone(),
+                        name.clone(),
+                        input.clone(),
+                    ));
+                    text_parts.push(format!("[tool_use:{}]", name));
+                }
+                ContentBlock::ToolResult { tool_use_id, content, is_error } => {
+                    tool_results_vec.push(ToolResultBlock {
+                        tool_use_id: tool_use_id.clone(),
+                        content: content.as_ref().map(|c| c.as_text()),
+                        is_error: *is_error,
+                    });
+                    if let Some(c) = content {
+                        let txt = c.as_text();
+                        if !txt.is_empty() {
+                            text_parts.push(txt);
+                        } else {
+                            text_parts.push(format!("[tool_result:{}]", tool_use_id));
+                        }
+                    } else {
+                        text_parts.push(format!("[tool_result:{}]", tool_use_id));
+                    }
+                }
+                ContentBlock::Image { source } => {
+                    text_parts.push(format!("[image:{}]", source.media_type));
+                }
             }
         }
         
@@ -194,6 +228,8 @@ impl Message {
             total_tokens,
             input_tokens,
             output_tokens,
+            tool_uses: tool_uses_vec,
+            tool_results: tool_results_vec,
             content_blocks: msg.message.content.clone(),
         }
     }

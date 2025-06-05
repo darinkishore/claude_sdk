@@ -181,25 +181,27 @@ impl PyTransition {
     }
 
     #[getter]
+    fn session_after(&self) -> Option<crate::python::classes::Session> {
+        self
+            .inner
+            .after
+            .session
+            .as_ref()
+            .map(|s| crate::python::classes::Session::from_rust_session((**s).clone()))
+    }
+
+    #[getter]
     fn recorded_at(&self) -> String {
         self.inner.recorded_at.to_rfc3339()
     }
 
-    fn new_messages(&self) -> PyResult<Py<PyAny>> {
-        Python::with_gil(|py| {
-            let messages = self.inner.new_messages();
-            // Convert to Python list of message dicts
-            let py_list = pyo3::types::PyList::empty(py);
-            for msg in messages {
-                // Convert MessageRecord to dict
-                let dict = PyDict::new(py);
-                dict.set_item("role", msg.message.role.to_string())?;
-                dict.set_item("timestamp", msg.timestamp.to_rfc3339())?;
-                // Add more fields as needed
-                py_list.append(dict)?;
-            }
-            Ok(py_list.into())
-        })
+    fn new_messages(&self) -> Vec<crate::python::classes::Message> {
+        self
+            .inner
+            .new_messages()
+            .into_iter()
+            .map(crate::python::classes::Message::from_rust_message)
+            .collect()
     }
 
     fn tools_used(&self) -> Vec<String> {

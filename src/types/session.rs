@@ -33,7 +33,7 @@ pub struct SummaryRecord {
 }
 
 /// Parsed session data with metadata
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParsedSession {
     pub session_id: SessionId,
     pub messages: Vec<MessageRecord>,
