@@ -75,6 +75,12 @@ impl Workspace {
     pub fn set_skip_permissions(&mut self, skip: bool) {
         self.executor.set_skip_permissions(skip);
     }
+    
+    /// Set the model to use for Claude execution
+    /// Set to None to use Claude's default model
+    pub fn set_model(&mut self, model: Option<String>) {
+        self.executor.set_model(model);
+    }
 }
 
 #[derive(Debug, thiserror::Error)]

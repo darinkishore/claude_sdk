@@ -127,7 +127,8 @@ class ClaudeAgent:
         self, 
         workspace: Union[str, Path], 
         auto_continue: bool = True,
-        record_transitions: bool = True
+        record_transitions: bool = True,
+        model: Optional[str] = None
     ):
         """Initialize a Claude agent.
         
@@ -135,8 +136,11 @@ class ClaudeAgent:
             workspace: Path to the workspace directory
             auto_continue: Whether to automatically continue conversations (default: True)
             record_transitions: Whether to persist transitions to disk (default: True)
+            model: Model to use for Claude execution (default: None, uses Claude's default)
         """
         self.workspace = Workspace(str(workspace))
+        if model is not None:
+            self.workspace.set_model(model)
         self.conversation = Conversation(self.workspace, record=record_transitions)
         self.auto_continue = auto_continue
         self._responses: List[AgentResponse] = []
@@ -203,7 +207,8 @@ class ClaudeAgent:
         path: Union[str, Path],
         workspace: Union[str, Path],
         auto_continue: bool = True,
-        record_transitions: bool = True
+        record_transitions: bool = True,
+        model: Optional[str] = None
     ) -> 'ClaudeAgent':
         """Load a conversation from disk.
         
@@ -212,11 +217,14 @@ class ClaudeAgent:
             workspace: Workspace path (must match the original)
             auto_continue: Whether to auto-continue loaded conversation
             record_transitions: Enable recording for the loaded conversation
+            model: Model to use for Claude execution (default: None, uses Claude's default)
             
         Returns:
             ClaudeAgent with the loaded conversation
         """
         workspace_obj = Workspace(str(workspace))
+        if model is not None:
+            workspace_obj.set_model(model)
         conversation = Conversation.load(str(path), workspace_obj, record=record_transitions)
         
         agent = cls.__new__(cls)

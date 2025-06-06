@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::execution::{
     ClaudeExecution as RustClaudeExecution, ClaudePrompt as RustClaudePrompt,
@@ -12,7 +12,7 @@ use crate::execution::{
 /// Python wrapper for Workspace
 #[pyclass(name = "Workspace")]
 pub struct PyWorkspace {
-    inner: Arc<RustWorkspace>,
+    inner: Arc<Mutex<RustWorkspace>>,
 }
 
 #[pymethods]
@@ -22,38 +22,47 @@ impl PyWorkspace {
         let workspace = RustWorkspace::new(PathBuf::from(path))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(Self {
-            inner: Arc::new(workspace),
+            inner: Arc::new(Mutex::new(workspace)),
         })
     }
 
     #[getter]
-    fn path(&self) -> String {
-        self.inner.path().display().to_string()
+    fn path(&self) -> PyResult<String> {
+        let workspace = self.inner.lock()
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+        Ok(workspace.path().display().to_string())
     }
 
     fn snapshot(&self) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self
-            .inner
+        let workspace = self.inner.lock()
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+        let snapshot = workspace
             .snapshot()
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
 
     fn snapshot_with_session(&self, session_id: &str) -> PyResult<PyEnvironmentSnapshot> {
-        let snapshot = self
-            .inner
+        let workspace = self.inner.lock()
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+        let snapshot = workspace
             .snapshot_with_session(session_id)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyEnvironmentSnapshot { inner: snapshot })
     }
 
     fn set_skip_permissions(&self, skip: bool) -> PyResult<()> {
-        // We need mutable access to workspace, but PyWorkspace holds Arc<RustWorkspace>
-        // This is a limitation of the current design - we'd need Arc<Mutex<RustWorkspace>>
-        // For now, let's document this limitation
-        Err(PyErr::new::<pyo3::exceptions::PyNotImplementedError, _>(
-            "set_skip_permissions not yet implemented due to Arc wrapper",
-        ))
+        let mut workspace = self.inner.lock()
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+        workspace.set_skip_permissions(skip);
+        Ok(())
+    }
+
+    fn set_model(&self, model: Option<String>) -> PyResult<()> {
+        let mut workspace = self.inner.lock()
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+        workspace.set_model(model);
+        Ok(())
     }
 }
 
@@ -68,11 +77,24 @@ impl PyConversation {
     #[new]
     #[pyo3(signature = (workspace, record=true))]
     fn new(workspace: &PyWorkspace, record: bool) -> PyResult<Self> {
+        // Need to clone the Arc<Mutex<>> for conversation, but conversation expects Arc<Workspace>
+        // We'll need to restructure this, but for now let's create a new pattern
+        let workspace_path = {
+            let ws = workspace.inner.lock()
+                .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+            ws.path().clone()
+        };
+        
+        // Create a new workspace for the conversation - this is a limitation we can improve later
+        let rust_workspace = RustWorkspace::new(workspace_path)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
+        let workspace_arc = Arc::new(rust_workspace);
+        
         let conversation = if record {
-            RustConversation::new_with_options(workspace.inner.clone(), true)
+            RustConversation::new_with_options(workspace_arc, true)
                 .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?
         } else {
-            RustConversation::new(workspace.inner.clone())
+            RustConversation::new(workspace_arc)
         };
         Ok(Self {
             inner: conversation,
@@ -129,9 +151,20 @@ impl PyConversation {
     #[staticmethod]
     #[pyo3(signature = (path, workspace, record=true))]
     fn load(path: &str, workspace: &PyWorkspace, record: bool) -> PyResult<Self> {
-        let conversation =
-            RustConversation::load(&PathBuf::from(path), workspace.inner.clone(), record)
-                .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
+        // Get workspace path for creating new workspace instance
+        let workspace_path = {
+            let ws = workspace.inner.lock()
+                .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("Lock error: {}", e)))?;
+            ws.path().clone()
+        };
+        
+        // Create a new workspace for the conversation
+        let rust_workspace = RustWorkspace::new(workspace_path)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
+        let workspace_arc = Arc::new(rust_workspace);
+        
+        let conversation = RustConversation::load(&PathBuf::from(path), workspace_arc, record)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(Self {
             inner: conversation,
         })

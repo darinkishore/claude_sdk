@@ -2,7 +2,7 @@
 
 ## T1 - Execution Engine
 
-- [ ] Make model configurable in ClaudeExecutor (currently hardcoded to claude-sonnet-4-20250514)
+- [x] Make model configurable in ClaudeExecutor (currently hardcoded to claude-sonnet-4-20250514)
   - Add model field to ClaudeExecutor struct
   - Add set_model() method
   - Pass model flag only if explicitly set
@@ -18,5 +18,5 @@
 
 ## Python Bindings
 
-- [ ] Expose model configuration in Python API
+- [x] Expose model configuration in Python API
 - [ ] Add workspace settings configuration (skip_permissions, etc.)

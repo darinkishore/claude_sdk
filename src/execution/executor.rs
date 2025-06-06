@@ -41,6 +41,7 @@ pub struct ClaudeExecutor {
     allowed_tools: Option<String>,
     disallowed_tools: Option<String>,
     skip_permissions: bool,
+    model: Option<String>,
 }
 
 impl ClaudeExecutor {
@@ -55,6 +56,7 @@ impl ClaudeExecutor {
             allowed_tools: None,
             disallowed_tools: None,
             skip_permissions: false,  // Don't skip by default
+            model: None,  // Use Claude's default model
         })
     }
     
@@ -74,6 +76,12 @@ impl ClaudeExecutor {
         self.skip_permissions = skip;
     }
     
+    /// Set the model to use for Claude execution
+    /// Set to None to use Claude's default model
+    pub fn set_model(&mut self, model: Option<String>) {
+        self.model = model;
+    }
+    
     pub fn execute(&self, prompt: ClaudePrompt) -> Result<ClaudeExecution, ExecutorError> {
         let start = std::time::Instant::now();
         
@@ -84,8 +92,10 @@ impl ClaudeExecutor {
         // Add flags (order matters for some)
         cmd.arg("--output-format").arg("json");
         
-        // Hardcode sonnet model for now (TODO: make configurable)
-        cmd.arg("--model").arg("claude-sonnet-4-20250514");
+        // Add model flag if specified
+        if let Some(ref model) = self.model {
+            cmd.arg("--model").arg(model);
+        }
         
         // Session management
         if let Some(ref session_id) = prompt.resume_session_id {
