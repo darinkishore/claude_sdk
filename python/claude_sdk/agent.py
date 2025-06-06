@@ -303,12 +303,8 @@ class ClaudeEnvironment:
         Args:
             checkpoint_id: The checkpoint to restore
         """
-        # In a real implementation, this would restore file system state
-        # For now, we just note that this is where that logic would go
-        raise NotImplementedError(
-            "File system restoration not yet implemented. "
-            "This would require git-like functionality or filesystem snapshots."
-        )
+        # TODO: Implement this
+        raise NotImplementedError("File system restoration not yet implemented")
     
     def send(self, message: str) -> AgentResponse:
         """Send a message in current state.
@@ -328,6 +324,8 @@ class ClaudeEnvironment:
         checkpoint_id: str, 
         message: str
     ) -> tuple[str, AgentResponse]:
+        # TODO: Implement this
+        raise NotImplementedError("Explore from a checkpoint is not implemented")
         """Explore from a checkpoint without changing current state.
         
         Args:
