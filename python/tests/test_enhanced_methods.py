@@ -5,7 +5,7 @@ This tests the current implementation and prepares for new methods.
 import os
 import pytest
 from pathlib import Path
-import claude_sdk
+import claude_code_analytics
 
 # Use the real fixture file from the Rust tests directory
 FIXTURE_PATH = Path(__file__).parent.parent.parent / "tests" / "db68d083-0471-4213-8609-356b0bf38fec.jsonl"
@@ -16,7 +16,7 @@ class TestCurrentMethods:
     
     def test_load_session(self):
         """Test basic session loading"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Basic assertions
         assert session is not None
@@ -43,7 +43,7 @@ class TestCurrentMethods:
     
     def test_message_get_tool_blocks(self):
         """Test get_tool_blocks method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Find a message with tools
         tool_message = None
@@ -63,7 +63,7 @@ class TestCurrentMethods:
     
     def test_session_get_main_chain(self):
         """Test get_main_chain method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         main_chain = session.get_main_chain()
         
         assert isinstance(main_chain, list)
@@ -73,7 +73,7 @@ class TestCurrentMethods:
     
     def test_session_get_messages_by_role(self):
         """Test get_messages_by_role method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         user_messages = session.get_messages_by_role("user")
         assistant_messages = session.get_messages_by_role("assistant")
@@ -93,7 +93,7 @@ class TestEnhancedMethods:
     
     def test_message_get_text_blocks(self):
         """Test get_text_blocks method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         msg = session.messages[0]
         
         text_blocks = msg.get_text_blocks()
@@ -104,7 +104,7 @@ class TestEnhancedMethods:
     
     def test_message_has_tool_use(self):
         """Test has_tool_use method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Find messages with and without tools
         has_tools = False
@@ -123,7 +123,7 @@ class TestEnhancedMethods:
     
     def test_message_token_properties(self):
         """Test token usage properties"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Find an assistant message (likely to have token info)
         for msg in session.messages:
@@ -138,7 +138,7 @@ class TestEnhancedMethods:
     
     def test_session_get_messages_by_tool(self):
         """Test get_messages_by_tool method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Find a tool that's used
         if session.tools_used:
@@ -151,7 +151,7 @@ class TestEnhancedMethods:
     
     def test_session_get_message_by_uuid(self):
         """Test get_message_by_uuid method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Get a known UUID
         target_uuid = session.messages[0].uuid
@@ -166,7 +166,7 @@ class TestEnhancedMethods:
     
     def test_session_filter_messages(self):
         """Test filter_messages method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Filter for user messages
         user_msgs = session.filter_messages(lambda m: m.role == "user")
@@ -178,7 +178,7 @@ class TestEnhancedMethods:
     
     def test_session_get_thread(self):
         """Test get_thread method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Find a message with a parent
         for msg in session.messages:
@@ -195,7 +195,7 @@ class TestEnhancedMethods:
     @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_calculate_metrics(self):
         """Test calculate_metrics method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         metrics = session.calculate_metrics()
         assert isinstance(metrics, dict)
@@ -212,7 +212,7 @@ class TestEnhancedMethods:
     @pytest.mark.skip(reason="Method not yet implemented")
     def test_session_to_dict(self):
         """Test to_dict method"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         session_dict = session.to_dict()
         assert isinstance(session_dict, dict)
@@ -230,7 +230,7 @@ class TestEnhancedMethods:
     
     def test_session_iteration(self):
         """Test __len__ and __iter__ methods"""
-        session = claude_sdk.load(FIXTURE_PATH)
+        session = claude_code_analytics.load(FIXTURE_PATH)
         
         # Test length
         assert len(session) == len(session.messages)

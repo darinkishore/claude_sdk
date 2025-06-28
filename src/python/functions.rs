@@ -24,7 +24,7 @@ use super::exceptions::{ParseError, SessionError};
 ///     ClaudeSDKError: Base class for all SDK-specific exceptions
 /// 
 /// Example:
-///     >>> from claude_sdk import load
+///     >>> from claude_code_analytics import load
 ///     >>> session = load("conversation.jsonl")
 ///     >>> print(f"Session ID: {session.session_id}")
 ///     >>> print(f"Total cost: ${session.total_cost:.4f}")

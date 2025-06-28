@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
-import claude_sdk
+import claude_code_analytics
 
 FIXTURE = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "example_sample.jsonl"
 
 def test_fixture_parsing():
-    session = claude_sdk.load(FIXTURE)
+    session = claude_code_analytics.load(FIXTURE)
     with open(FIXTURE) as f:
         records = [json.loads(line) for line in f if line.strip()]
 
@@ -35,23 +35,23 @@ def test_fixture_parsing():
         assert len(blocks) == len(raw["message"]["content"])
         for b, r in zip(blocks, raw["message"]["content"]):
             if r["type"] == "text":
-                assert isinstance(b, claude_sdk.TextBlock)
+                assert isinstance(b, claude_code_analytics.TextBlock)
                 assert b.text == r["text"]
             elif r["type"] == "thinking":
-                assert isinstance(b, claude_sdk.ThinkingBlock)
+                assert isinstance(b, claude_code_analytics.ThinkingBlock)
                 assert b.thinking == r["thinking"]
                 assert b.signature == r["signature"]
             elif r["type"] == "tool_use":
-                assert isinstance(b, claude_sdk.ToolUseBlock)
+                assert isinstance(b, claude_code_analytics.ToolUseBlock)
                 assert b.id == r["id"]
                 assert b.name == r["name"]
             elif r["type"] == "tool_result":
-                assert isinstance(b, claude_sdk.ToolResultBlock)
+                assert isinstance(b, claude_code_analytics.ToolResultBlock)
                 assert b.tool_use_id == r["tool_use_id"]
                 assert b.content == r["content"]
                 assert b.is_error == r["is_error"]
             elif r["type"] == "image":
-                assert isinstance(b, claude_sdk.ImageBlock)
+                assert isinstance(b, claude_code_analytics.ImageBlock)
                 assert b.media_type == r["source"]["media_type"]
                 assert b.source_type == r["source"]["type"]
                 assert b.data == r["source"]["data"]

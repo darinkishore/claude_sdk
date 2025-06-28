@@ -1,13 +1,13 @@
 [package]
 name = "claude-code-analytics"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 exclude = ["python/.venv", "python/.pytest_cache", "target/", "dist/"]
 readme = "README.md"
 license = "MIT"
 
 [lib]
-name = "claude_sdk"
+name = "claude_code_analytics"
 crate-type = ["cdylib", "rlib"]
 
 [features]

@@ -36,7 +36,7 @@ use std::collections::HashMap;
 ///     ...     print(f"{msg.role}: {msg.text[:50]}...")
 ///     ...     if msg.cost:
 ///     ...         print(f"  Cost: ${msg.cost:.4f}")
-#[pyclass(name = "Message", module = "claude_sdk")]
+#[pyclass(name = "Message", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct Message {
     #[pyo3(get)]
@@ -200,7 +200,7 @@ impl Message {
 }
 
 /// Iterator for messages in a session
-#[pyclass(name = "MessageIterator", module = "claude_sdk")]
+#[pyclass(name = "MessageIterator", module = "claude_code_analytics")]
 struct MessageIterator {
     messages: Vec<Message>,
     index: usize,
@@ -253,7 +253,7 @@ impl MessageIterator {
 ///     >>> # Get only user messages
 ///     >>> user_msgs = session.get_messages_by_role("user")
 ///     >>> print(f"User messages: {len(user_msgs)}")
-#[pyclass(name = "Session", module = "claude_sdk")]
+#[pyclass(name = "Session", module = "claude_code_analytics")]
 pub struct Session {
     #[pyo3(get)]
     pub session_id: String,
@@ -544,7 +544,7 @@ fn extract_tool_executions(messages: &[RustMessageRecord]) -> Vec<crate::python:
 ///     >>> # Analyze tool usage
 ///     >>> for tool, count in project.tool_usage_count.items():
 ///     ...     print(f"{tool}: {count} uses")
-#[pyclass(name = "Project", module = "claude_sdk")]
+#[pyclass(name = "Project", module = "claude_code_analytics")]
 pub struct Project {
     #[pyo3(get)]
     pub name: String,

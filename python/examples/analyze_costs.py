@@ -6,7 +6,7 @@ This script provides deep insights into your Claude usage costs,
 with fun comparisons, trends, and predictions.
 """
 
-import claude_sdk
+import claude_code_analytics
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 import json
@@ -24,12 +24,12 @@ try:
 except ImportError:
     # Minimal fallbacks
     def load_example_session():
-        sessions = claude_sdk.find_sessions()
-        return claude_sdk.load(sessions[0]) if sessions else None
+        sessions = claude_code_analytics.find_sessions()
+        return claude_code_analytics.load(sessions[0]) if sessions else None
     
     def load_example_project():
-        projects = claude_sdk.find_projects()
-        return claude_sdk.load_project(projects[0]) if projects else None
+        projects = claude_code_analytics.find_projects()
+        return claude_code_analytics.load_project(projects[0]) if projects else None
     
     def ensure_export_directory(name="exports"):
         Path(name).mkdir(exist_ok=True)
@@ -370,7 +370,7 @@ def main():
     try:
         # Load all sessions
         all_sessions = []
-        projects = claude_sdk.find_projects()
+        projects = claude_code_analytics.find_projects()
         
         if not projects:
             sys.stderr = original_stderr
@@ -383,7 +383,7 @@ def main():
         loaded_projects = 0
         for project_path in projects:
             try:
-                project = claude_sdk.load_project(project_path)
+                project = claude_code_analytics.load_project(project_path)
                 if project.sessions:
                     all_sessions.extend(project.sessions)
                     loaded_projects += 1

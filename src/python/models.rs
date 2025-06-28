@@ -24,7 +24,7 @@ use std::collections::HashMap;
 ///     session_duration: Duration of the session in seconds
 ///     total_duration_ms: Total processing time in milliseconds
 ///     average_response_time_ms: Average assistant response time
-#[pyclass(name = "SessionMetadata", module = "claude_sdk")]
+#[pyclass(name = "SessionMetadata", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct SessionMetadata {
     #[pyo3(get)]
@@ -106,7 +106,7 @@ impl SessionMetadata {
 ///     stderr: Standard error if available
 ///     interrupted: Whether the execution was interrupted
 ///     is_error: Whether the execution resulted in an error
-#[pyclass(name = "ToolResult", module = "claude_sdk")]
+#[pyclass(name = "ToolResult", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ToolResult {
     #[pyo3(get)]
@@ -156,7 +156,7 @@ impl ToolResult {
 ///     output: ToolResult object with execution results
 ///     duration_ms: Execution duration in milliseconds
 ///     timestamp: When the tool was executed
-#[pyclass(name = "ToolExecution", module = "claude_sdk")]
+#[pyclass(name = "ToolExecution", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ToolExecution {
     #[pyo3(get)]
@@ -220,7 +220,7 @@ impl ToolExecution {
 ///     max_depth: Maximum depth of the conversation tree
 ///     num_branches: Number of branching points
 ///     leaf_count: Number of leaf nodes (messages with no replies)
-#[pyclass(name = "ConversationStats", module = "claude_sdk")]
+#[pyclass(name = "ConversationStats", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ConversationStats {
     #[pyo3(get)]
@@ -248,7 +248,7 @@ impl ConversationStats {
 /// Properties:
 ///     message: The Message object at this node
 ///     children: List of child ConversationNode objects
-#[pyclass(name = "ConversationNode", module = "claude_sdk")]
+#[pyclass(name = "ConversationNode", module = "claude_code_analytics")]
 pub struct ConversationNode {
     #[pyo3(get)]
     pub message: crate::python::classes::Message,
@@ -314,7 +314,7 @@ impl ConversationNode {
 ///     orphaned_messages: List of message UUIDs with missing parents
 ///     circular_references: List of (uuid, uuid) tuples indicating circular references
 ///     stats: ConversationStats object with tree metrics
-#[pyclass(name = "ConversationTree", module = "claude_sdk")]
+#[pyclass(name = "ConversationTree", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ConversationTree {
     root_nodes: Vec<ConversationNode>,
@@ -380,7 +380,7 @@ impl ConversationTree {
 }
 
 /// A block of text content in a message
-#[pyclass(name = "TextBlock", module = "claude_sdk")]
+#[pyclass(name = "TextBlock", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct TextBlock {
     #[pyo3(get)]
@@ -408,7 +408,7 @@ impl TextBlock {
 ///     id: Unique identifier for this tool use
 ///     name: Name of the tool being invoked
 ///     input: Input parameters as a dictionary
-#[pyclass(name = "ToolUseBlock", module = "claude_sdk")]
+#[pyclass(name = "ToolUseBlock", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ToolUseBlock {
     #[pyo3(get)]
@@ -442,7 +442,7 @@ impl ToolUseBlock {
 }
 
 /// A thinking block in a message
-#[pyclass(name = "ThinkingBlock", module = "claude_sdk")]
+#[pyclass(name = "ThinkingBlock", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ThinkingBlock {
     #[pyo3(get)]
@@ -459,7 +459,7 @@ impl ThinkingBlock {
 }
 
 /// An image block in a message
-#[pyclass(name = "ImageBlock", module = "claude_sdk")]
+#[pyclass(name = "ImageBlock", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ImageBlock {
     #[pyo3(get)]
@@ -478,7 +478,7 @@ impl ImageBlock {
 }
 
 /// A tool result block in a message
-#[pyclass(name = "ToolResultBlock", module = "claude_sdk")]
+#[pyclass(name = "ToolResultBlock", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct ToolResultBlock {
     #[pyo3(get)]
@@ -497,7 +497,7 @@ impl ToolResultBlock {
 }
 
 /// Token usage statistics for a message
-#[pyclass(name = "TokenUsage", module = "claude_sdk")]
+#[pyclass(name = "TokenUsage", module = "claude_code_analytics")]
 #[derive(Clone)]
 pub struct TokenUsage {
     #[pyo3(get)]

@@ -10,7 +10,7 @@ from typing import Optional, Union, List
 
 # Import from Rust core
 try:
-    from claude_sdk._core import (
+    from claude_code_analytics._core import (
         # Main functions
         load,
         find_sessions as _find_sessions_internal,

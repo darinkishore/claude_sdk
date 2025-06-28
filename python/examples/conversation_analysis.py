@@ -6,7 +6,7 @@ This script demonstrates how to analyze conversation structure,
 including branching, sidechains, message threading, and conversation flow.
 """
 
-import claude_sdk
+import claude_code_analytics
 from collections import defaultdict
 
 
@@ -315,7 +315,7 @@ def find_interesting_patterns(sessions):
 
 def main():
     # Load sessions
-    sessions = claude_sdk.find_sessions()
+    sessions = claude_code_analytics.find_sessions()
     
     if not sessions:
         print("No sessions found. Please ensure you have Claude Code sessions in ~/.claude/projects/")
@@ -324,7 +324,7 @@ def main():
     # Example 1: Analyze a single session's structure
     print("Loading most recent session for structure analysis...")
     latest_session_path = max(sessions[:10], key=lambda p: p.stat().st_mtime)
-    session = claude_sdk.load(latest_session_path)
+    session = claude_code_analytics.load(latest_session_path)
     
     # Visualize the conversation tree
     visualize_conversation_tree(session.conversation_tree)
@@ -346,7 +346,7 @@ def main():
     recent_sessions = []
     for session_path in sorted(sessions, key=lambda p: p.stat().st_mtime, reverse=True)[:10]:
         try:
-            recent_sessions.append(claude_sdk.load(session_path))
+            recent_sessions.append(claude_code_analytics.load(session_path))
         except Exception as e:
             print(f"  Error loading {session_path.name}: {e}")
     

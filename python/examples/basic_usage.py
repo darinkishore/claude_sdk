@@ -6,7 +6,7 @@ This script demonstrates fundamental operations like loading sessions,
 accessing messages, and extracting basic statistics.
 """
 
-import claude_sdk
+import claude_code_analytics
 from pathlib import Path
 
 
@@ -18,7 +18,7 @@ def main():
     session_path = "~/.claude/projects/myproject/session_20240101_120000.jsonl"
     
     try:
-        session = claude_sdk.load(session_path)
+        session = claude_code_analytics.load(session_path)
         print(f"✓ Loaded session: {session.session_id}")
         print(f"  Messages: {len(session.messages)}")
         print(f"  Cost: ${session.total_cost:.4f}")
@@ -26,13 +26,13 @@ def main():
     except FileNotFoundError:
         print(f"✗ Session file not found: {session_path}")
         print("  Using example path - replace with your actual session file")
-    except claude_sdk.ParseError as e:
+    except claude_code_analytics.ParseError as e:
         print(f"✗ Failed to parse session: {e}")
     
     # Example 2: Find all sessions
     print("\n=== Finding Sessions ===")
     
-    sessions = claude_sdk.find_sessions()
+    sessions = claude_code_analytics.find_sessions()
     print(f"Found {len(sessions)} total sessions")
     
     # Show first 5 sessions
@@ -46,9 +46,9 @@ def main():
     print("\n=== Project-Specific Sessions ===")
     
     # Try to use the first available project if any exist
-    available_projects = claude_sdk.find_projects()
+    available_projects = claude_code_analytics.find_projects()
     project_name = available_projects[0].name if available_projects else "myproject"
-    project_sessions = claude_sdk.find_sessions(project=project_name)
+    project_sessions = claude_code_analytics.find_sessions(project=project_name)
     
     if project_sessions:
         print(f"Found {len(project_sessions)} sessions in project '{project_name}'")
@@ -56,7 +56,7 @@ def main():
         # Load and analyze the most recent session
         if project_sessions:
             latest_session_path = max(project_sessions, key=lambda p: p.stat().st_mtime)
-            latest_session = claude_sdk.load(latest_session_path)
+            latest_session = claude_code_analytics.load(latest_session_path)
             
             print(f"\nLatest session in '{project_name}':")
             print(f"  ID: {latest_session.session_id}")
@@ -70,7 +70,7 @@ def main():
     
     try:
         # Load project by name
-        project = claude_sdk.load_project(project_name)
+        project = claude_code_analytics.load_project(project_name)
         
         print(f"Project: {project.name}")
         print(f"  Total sessions: {len(project.sessions)}")
@@ -87,7 +87,7 @@ def main():
         print(f"Project '{project_name}' not found")
         
         # Show available projects
-        available_projects = claude_sdk.find_projects()
+        available_projects = claude_code_analytics.find_projects()
         if available_projects:
             print("\nAvailable projects:")
             for proj_path in available_projects[:5]:
@@ -98,7 +98,7 @@ def main():
     
     if sessions:
         # Load the first available session for demonstration
-        first_session = claude_sdk.load(sessions[0])
+        first_session = claude_code_analytics.load(sessions[0])
         
         print(f"First 3 messages from session {first_session.session_id}:")
         for i, message in enumerate(first_session.messages[:3]):

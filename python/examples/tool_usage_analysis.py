@@ -6,7 +6,7 @@ This script demonstrates how to analyze tool usage patterns,
 execution times, success rates, and common tool combinations.
 """
 
-import claude_sdk
+import claude_code_analytics
 from collections import defaultdict, Counter
 from datetime import datetime
 import statistics
@@ -238,7 +238,7 @@ def find_tool_patterns(sessions):
 
 def main():
     # Load some sessions for analysis
-    sessions = claude_sdk.find_sessions()
+    sessions = claude_code_analytics.find_sessions()
     
     if not sessions:
         print("No sessions found. Please ensure you have Claude Code sessions in ~/.claude/projects/")
@@ -247,17 +247,17 @@ def main():
     # Example 1: Analyze tool executions in a single session
     print("Loading most recent session for tool analysis...")
     latest_session_path = max(sessions[:10], key=lambda p: p.stat().st_mtime)
-    session = claude_sdk.load(latest_session_path)
+    session = claude_code_analytics.load(latest_session_path)
     
     analyze_tool_executions(session)
     analyze_tool_usage_in_messages(session)
     
     # Example 2: Analyze project-wide patterns
-    projects = claude_sdk.find_projects()
+    projects = claude_code_analytics.find_projects()
     if projects:
         print("\n" + "="*50)
         print("Loading first project for pattern analysis...")
-        project = claude_sdk.load_project(projects[0])
+        project = claude_code_analytics.load_project(projects[0])
         analyze_project_tool_patterns(project)
     
     # Example 3: Cross-session patterns
@@ -268,7 +268,7 @@ def main():
     recent_sessions = []
     for session_path in sorted(sessions, key=lambda p: p.stat().st_mtime, reverse=True)[:20]:
         try:
-            recent_sessions.append(claude_sdk.load(session_path))
+            recent_sessions.append(claude_code_analytics.load(session_path))
         except Exception as e:
             print(f"  Error loading {session_path.name}: {e}")
     

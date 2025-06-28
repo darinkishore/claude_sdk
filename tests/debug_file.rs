@@ -1,4 +1,4 @@
-use claude_sdk::SessionParser;
+use claude_code_analytics::SessionParser;
 use std::thread;
 
 #[test]

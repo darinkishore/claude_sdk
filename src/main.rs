@@ -1,4 +1,4 @@
-use claude_sdk::{ClaudeError, SessionParser};
+use claude_code_analytics::{ClaudeError, SessionParser};
 use std::env;
 
 fn main() -> Result<(), ClaudeError> {

@@ -6,7 +6,7 @@ This script demonstrates how to export session data to JSON format
 for analysis, archival, or integration with other tools.
 """
 
-import claude_sdk
+import claude_code_analytics
 import json
 from pathlib import Path
 from datetime import datetime
@@ -320,7 +320,7 @@ def main():
     print("=" * 50)
     
     # Find sessions
-    sessions = claude_sdk.find_sessions()
+    sessions = claude_code_analytics.find_sessions()
     
     if not sessions:
         print("No sessions found.")
@@ -333,7 +333,7 @@ def main():
     # Example 1: Export single session (full content)
     print("\n1. Exporting single session with full content...")
     latest_session_path = max(sessions[:10], key=lambda p: p.stat().st_mtime)
-    session = claude_sdk.load(latest_session_path)
+    session = claude_code_analytics.load(latest_session_path)
     
     export_to_json(session, export_dir / "session_full.json", include_full_content=True)
     
@@ -345,7 +345,7 @@ def main():
     if session.project_name:
         print("\n3. Exporting project...")
         try:
-            project = claude_sdk.load_project(session.project_name)
+            project = claude_code_analytics.load_project(session.project_name)
             export_project_summary(project, export_dir / f"project_{project.name}")
         except Exception as e:
             print(f"Could not export project: {e}")
@@ -355,7 +355,7 @@ def main():
     recent_sessions = []
     for session_path in sorted(sessions, key=lambda p: p.stat().st_mtime, reverse=True)[:20]:
         try:
-            recent_sessions.append(claude_sdk.load(session_path))
+            recent_sessions.append(claude_code_analytics.load(session_path))
         except Exception:
             continue
     

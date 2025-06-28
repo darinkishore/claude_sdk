@@ -50,10 +50,10 @@ uv build
 ## Quick Start
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
 # Load a session from a JSONL file
-session = claude_sdk.load("~/.claude/projects/myproject/session_20240101_120000.jsonl")
+session = claude_code_analytics.load("~/.claude/projects/myproject/session_20240101_120000.jsonl")
 
 # Basic session info
 print(f"Session ID: {session.session_id}")
@@ -66,7 +66,7 @@ for message in session:
     print(f"{message.role}: {message.text[:100]}...")
     
 # Find all your sessions
-sessions = claude_sdk.find_sessions()
+sessions = claude_code_analytics.find_sessions()
 for session_path in sessions:
     print(f"Found session: {session_path}")
 ```
@@ -116,7 +116,7 @@ The SDK automatically reconstructs the conversation structure, handling:
 Load a Claude Code session from a JSONL file.
 
 ```python
-session = claude_sdk.load("path/to/session.jsonl")
+session = claude_code_analytics.load("path/to/session.jsonl")
 ```
 
 **Parameters:**
@@ -135,13 +135,13 @@ Discover Claude Code session files.
 
 ```python
 # Find all sessions
-all_sessions = claude_sdk.find_sessions()
+all_sessions = claude_code_analytics.find_sessions()
 
 # Find sessions in a specific project
-project_sessions = claude_sdk.find_sessions(project="myproject")
+project_sessions = claude_code_analytics.find_sessions(project="myproject")
 
 # Search in a custom location
-custom_sessions = claude_sdk.find_sessions(base_path="/custom/path")
+custom_sessions = claude_code_analytics.find_sessions(base_path="/custom/path")
 ```
 
 **Parameters:**
@@ -155,7 +155,7 @@ custom_sessions = claude_sdk.find_sessions(base_path="/custom/path")
 Find all Claude Code projects.
 
 ```python
-projects = claude_sdk.find_projects()
+projects = claude_code_analytics.find_projects()
 for project_path in projects:
     print(f"Project: {project_path.name}")
 ```
@@ -171,10 +171,10 @@ Load an entire project with all its sessions.
 
 ```python
 # Load by project name
-project = claude_sdk.load_project("myproject")
+project = claude_code_analytics.load_project("myproject")
 
 # Load by path
-project = claude_sdk.load_project("/path/to/project")
+project = claude_code_analytics.load_project("/path/to/project")
 
 print(f"Total sessions: {len(project.sessions)}")
 print(f"Total cost: ${project.total_cost:.2f}")
@@ -280,9 +280,9 @@ text_blocks = message.get_text_blocks()
 
 # Get all content blocks with proper typing
 for block in message.get_content_blocks():
-    if isinstance(block, claude_sdk.TextBlock):
+    if isinstance(block, claude_code_analytics.TextBlock):
         print(f"Text: {block.text}")
-    elif isinstance(block, claude_sdk.ToolUseBlock):
+    elif isinstance(block, claude_code_analytics.ToolUseBlock):
         print(f"Tool: {block.name}")
 ```
 
@@ -302,7 +302,7 @@ Container for multiple sessions in a project.
 | `total_duration` | `Optional[float]` | Total time in seconds |
 
 ```python
-project = claude_sdk.load_project("myproject")
+project = claude_code_analytics.load_project("myproject")
 
 # Analyze tool usage patterns
 for tool, count in project.tool_usage_count.items():
@@ -373,17 +373,17 @@ for root in tree.root_messages:
 
 ```python
 # Exception hierarchy
-claude_sdk.ClaudeSDKError          # Base exception
-├── claude_sdk.ParseError          # JSONL parsing failed
-├── claude_sdk.ValidationError     # Invalid data
-└── claude_sdk.SessionError        # Session-specific issues
+claude_code_analytics.ClaudeSDKError          # Base exception
+├── claude_code_analytics.ParseError          # JSONL parsing failed
+├── claude_code_analytics.ValidationError     # Invalid data
+└── claude_code_analytics.SessionError        # Session-specific issues
 
 # Example handling
 try:
-    session = claude_sdk.load("session.jsonl")
-except claude_sdk.ParseError as e:
+    session = claude_code_analytics.load("session.jsonl")
+except claude_code_analytics.ParseError as e:
     print(f"Failed to parse: {e}")
-except claude_sdk.ClaudeSDKError as e:
+except claude_code_analytics.ClaudeSDKError as e:
     print(f"SDK error: {e}")
 ```
 
@@ -392,10 +392,10 @@ except claude_sdk.ClaudeSDKError as e:
 ### Basic Session Analysis
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
 # Load session
-session = claude_sdk.load("session.jsonl")
+session = claude_code_analytics.load("session.jsonl")
 
 # Print summary
 print(f"Session: {session.session_id}")
@@ -412,10 +412,10 @@ print(f"Total tokens: {total_tokens:,}")
 ### Tool Usage Patterns
 
 ```python
-import claude_sdk
+import claude_code_analytics
 from collections import defaultdict
 
-session = claude_sdk.load("session.jsonl")
+session = claude_code_analytics.load("session.jsonl")
 
 # Count tool usage by message
 tool_messages = defaultdict(list)
@@ -437,16 +437,16 @@ for tool, messages in sorted(tool_messages.items()):
 ### Cost Analysis Across Projects
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
 # Find all projects
-projects = claude_sdk.find_projects()
+projects = claude_code_analytics.find_projects()
 
 # Analyze costs
 project_costs = []
 for project_path in projects:
     try:
-        project = claude_sdk.load_project(project_path)
+        project = claude_code_analytics.load_project(project_path)
         project_costs.append((project.name, project.total_cost, len(project.sessions)))
     except Exception as e:
         print(f"Failed to load {project_path}: {e}")
@@ -465,9 +465,9 @@ for name, cost, session_count in project_costs:
 ### Conversation Flow Analysis
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
-session = claude_sdk.load("session.jsonl")
+session = claude_code_analytics.load("session.jsonl")
 tree = session.conversation_tree
 
 # Find branching points
@@ -494,11 +494,11 @@ if sidechain_messages:
 ### Exporting Session Data
 
 ```python
-import claude_sdk
+import claude_code_analytics
 import json
 import csv
 
-session = claude_sdk.load("session.jsonl")
+session = claude_code_analytics.load("session.jsonl")
 
 # Export to JSON
 export_data = {
@@ -555,7 +555,7 @@ The Claude SDK is built with Rust for exceptional performance:
 
 ### Common Issues
 
-#### ImportError: No module named 'claude_sdk'
+#### ImportError: No module named 'claude_code_analytics'
 
 **Solution**: Ensure you've installed the package:
 ```bash
@@ -571,7 +571,7 @@ uv build
 import os
 path = os.path.expanduser("~/.claude/projects/myproject/session.jsonl")
 if os.path.exists(path):
-    session = claude_sdk.load(path)
+    session = claude_code_analytics.load(path)
 ```
 
 #### ParseError: Invalid JSONL format
@@ -591,8 +591,8 @@ python -m json.tool session.jsonl
 ```python
 # Instead of loading all sessions at once
 sessions = []
-for path in claude_sdk.find_sessions(project="large_project"):
-    session = claude_sdk.load(path)
+for path in claude_code_analytics.find_sessions(project="large_project"):
+    session = claude_code_analytics.load(path)
     # Process session
     del session  # Free memory
 ```
@@ -606,7 +606,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Now SDK operations will print debug info
-session = claude_sdk.load("session.jsonl")
+session = claude_code_analytics.load("session.jsonl")
 ```
 
 ## Development

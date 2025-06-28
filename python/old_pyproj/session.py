@@ -14,7 +14,7 @@ The Session class represents a complete Claude Code conversation, including:
 
 Example:
     ```python
-    from claude_sdk import load
+    from claude_code_analytics import load
 
     # Load a session
     session = load("path/to/session.jsonl")
@@ -90,7 +90,7 @@ class Session(_ParsedSession):
 
     Example:
         ```python
-        from claude_sdk import load
+        from claude_code_analytics import load
 
         # Load a session
         session = load("conversation.jsonl")
@@ -127,7 +127,7 @@ class Session(_ParsedSession):
 
     CLI Usage:
         ```python
-        from claude_sdk import load, find_sessions
+        from claude_code_analytics import load, find_sessions
 
         # Find and load the most recent session
         paths = find_sessions()

@@ -1,4 +1,4 @@
-use claude_sdk::{SessionParser, MessageRecord, ContentBlock, Role};
+use claude_code_analytics::{SessionParser, MessageRecord, ContentBlock, Role};
 use std::io::Write;
 use tempfile::NamedTempFile;
 
@@ -83,7 +83,7 @@ fn test_parse_empty_file() {
     let parser = SessionParser::new(temp_file.path());
     
     match parser.parse() {
-        Err(claude_sdk::ClaudeError::ParseError(claude_sdk::ParseError::EmptyFile)) => {
+        Err(claude_code_analytics::ClaudeError::ParseError(claude_code_analytics::ParseError::EmptyFile)) => {
             // Expected error
         }
         _ => panic!("Expected EmptyFile error"),

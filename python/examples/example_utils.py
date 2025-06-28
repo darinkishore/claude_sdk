@@ -6,7 +6,7 @@ This module provides helper functions to make examples more robust
 and work reliably for any user, regardless of their data.
 """
 
-import claude_sdk
+import claude_code_analytics
 import sys
 import os
 from pathlib import Path
@@ -14,7 +14,7 @@ from pathlib import Path
 
 def find_valid_sessions(limit=None, project=None):
     """Find valid, non-empty sessions."""
-    all_sessions = claude_sdk.find_sessions(project=project)
+    all_sessions = claude_code_analytics.find_sessions(project=project)
     
     valid_sessions = []
     for session_path in all_sessions:
@@ -22,7 +22,7 @@ def find_valid_sessions(limit=None, project=None):
             # Check if file is not empty
             if session_path.stat().st_size > 0:
                 # Try to load it to verify it's valid
-                session = claude_sdk.load(session_path)
+                session = claude_code_analytics.load(session_path)
                 if session.messages:  # Has actual messages
                     valid_sessions.append(session_path)
         except Exception:
@@ -37,11 +37,11 @@ def find_valid_sessions(limit=None, project=None):
 
 def find_active_project():
     """Find a project with valid sessions."""
-    projects = claude_sdk.find_projects()
+    projects = claude_code_analytics.find_projects()
     
     for project_path in projects:
         try:
-            project = claude_sdk.load_project(project_path)
+            project = claude_code_analytics.load_project(project_path)
             if project.sessions:  # Has valid sessions
                 return project
         except Exception:
@@ -62,7 +62,7 @@ def load_example_session():
     
     # Load the most recent valid session
     latest_session_path = max(valid_sessions, key=lambda p: p.stat().st_mtime)
-    return claude_sdk.load(latest_session_path)
+    return claude_code_analytics.load(latest_session_path)
 
 
 def load_example_project():

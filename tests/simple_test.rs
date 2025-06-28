@@ -1,4 +1,4 @@
-use claude_sdk::SessionParser;
+use claude_code_analytics::SessionParser;
 
 #[test]
 fn test_single_file() {

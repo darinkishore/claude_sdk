@@ -115,7 +115,7 @@ Most examples will:
 
 Each example includes comments explaining how to modify the code for your needs:
 
-- **Change session paths**: Look for `claude_sdk.load()` calls
+- **Change session paths**: Look for `claude_code_analytics.load()` calls
 - **Adjust analysis parameters**: Modify constants at the top of each file
 - **Filter specific projects**: Use the `project` parameter in `find_sessions()`
 - **Customize exports**: Modify the export functions to include/exclude data
@@ -125,38 +125,38 @@ Each example includes comments explaining how to modify the code for your needs:
 ### Loading a Specific Session
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
 # Load by exact path
-session = claude_sdk.load("/path/to/session.jsonl")
+session = claude_code_analytics.load("/path/to/session.jsonl")
 
 # Load from default location
-session = claude_sdk.load("~/.claude/projects/myproject/session_20240101_120000.jsonl")
+session = claude_code_analytics.load("~/.claude/projects/myproject/session_20240101_120000.jsonl")
 ```
 
 ### Finding Sessions
 
 ```python
 # Find all sessions
-all_sessions = claude_sdk.find_sessions()
+all_sessions = claude_code_analytics.find_sessions()
 
 # Find in specific project
-project_sessions = claude_sdk.find_sessions(project="myproject")
+project_sessions = claude_code_analytics.find_sessions(project="myproject")
 
 # Find with custom base path
-custom_sessions = claude_sdk.find_sessions(base_path="/custom/path")
+custom_sessions = claude_code_analytics.find_sessions(base_path="/custom/path")
 ```
 
 ### Error Handling
 
 ```python
 try:
-    session = claude_sdk.load("session.jsonl")
-except claude_sdk.ParseError as e:
+    session = claude_code_analytics.load("session.jsonl")
+except claude_code_analytics.ParseError as e:
     print(f"Failed to parse: {e}")
 except FileNotFoundError:
     print("Session file not found")
-except claude_sdk.ClaudeSDKError as e:
+except claude_code_analytics.ClaudeSDKError as e:
     print(f"SDK error: {e}")
 ```
 
@@ -177,8 +177,8 @@ long_messages = session.filter_messages(lambda m: len(m.text) > 1000)
 
 1. **Process large projects in batches** to manage memory:
    ```python
-   for session_path in claude_sdk.find_sessions(project="large_project"):
-       session = claude_sdk.load(session_path)
+   for session_path in claude_code_analytics.find_sessions(project="large_project"):
+       session = claude_code_analytics.load(session_path)
        # Process session
        del session  # Free memory
    ```

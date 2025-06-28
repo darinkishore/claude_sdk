@@ -6,7 +6,7 @@ costs, tool usage, and conversation patterns.
 
 Basic usage:
 ```python
-from claude_sdk import load, Session
+from claude_code_analytics import load, Session
 
 # Load a session from a JSONL file
 session = load("conversation.jsonl")
@@ -26,7 +26,7 @@ for msg in session.messages:
 
 Finding session files:
 ```python
-from claude_sdk import find_sessions
+from claude_code_analytics import find_sessions
 
 # Find all sessions in ~/.claude/projects/
 session_paths = find_sessions()
@@ -42,7 +42,7 @@ for path in session_paths:
 
 Error handling:
 ```python
-from claude_sdk import load, ClaudeSDKError, ParseError
+from claude_code_analytics import load, ClaudeSDKError, ParseError
 
 try:
     session = load("conversation.jsonl")
@@ -56,7 +56,7 @@ except ClaudeSDKError as e:
 
 Common tool and cost analysis:
 ```python
-from claude_sdk import load
+from claude_code_analytics import load
 
 session = load("conversation.jsonl")
 
@@ -132,7 +132,7 @@ def load(file_path: str | Path) -> Session:
 
     Example:
         ```python
-        from claude_sdk import load
+        from claude_code_analytics import load
 
         # Basic usage
         session = load("conversation.jsonl")
@@ -160,7 +160,7 @@ def load(file_path: str | Path) -> Session:
     CLI Usage:
         In Claude Code CLI context, you'll typically use this to load session files:
         ```python
-        from claude_sdk import load
+        from claude_code_analytics import load
         from pathlib import Path
 
         # For a file you can see in ls output
@@ -207,7 +207,7 @@ def find_projects(base_path: str | Path | None = None) -> list[Path]:
 
     Example:
         ```python
-        from claude_sdk import find_projects, load_project
+        from claude_code_analytics import find_projects, load_project
 
         # Find all projects
         project_paths = find_projects()
@@ -228,7 +228,7 @@ def find_projects(base_path: str | Path | None = None) -> list[Path]:
     CLI Usage:
         In Claude Code CLI context, you'll typically use this to find projects:
         ```python
-        from claude_sdk import find_projects
+        from claude_code_analytics import find_projects
 
         # List available projects
         paths = find_projects()
@@ -269,7 +269,7 @@ def load_project(project_identifier: str | Path, base_path: str | Path | None = 
 
     Example:
         ```python
-        from claude_sdk import load_project
+        from claude_code_analytics import load_project
 
         # Load by project name
         project = load_project("apply-model")
@@ -293,7 +293,7 @@ def load_project(project_identifier: str | Path, base_path: str | Path | None = 
     CLI Usage:
         In Claude Code CLI context, you'll typically use this to analyze projects:
         ```python
-        from claude_sdk import find_projects, load_project
+        from claude_code_analytics import find_projects, load_project
 
         # Find and load specific project
         paths = find_projects()
@@ -344,7 +344,7 @@ def find_sessions(
 
     Example:
         ```python
-        from claude_sdk import find_sessions, load, find_projects
+        from claude_code_analytics import find_sessions, load, find_projects
 
         # Basic usage - find all sessions in default directory (~/.claude/projects/)
         session_paths = find_sessions()
@@ -376,7 +376,7 @@ def find_sessions(
     CLI Usage:
         In Claude Code CLI context, you'll typically use this to find sessions:
         ```python
-        from claude_sdk import find_sessions, find_projects
+        from claude_code_analytics import find_sessions, find_projects
 
         # List recent sessions
         paths = find_sessions()

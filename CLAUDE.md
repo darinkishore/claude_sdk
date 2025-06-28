@@ -16,7 +16,7 @@ cd python
 uv build
 
 # Test the installation
-python -c "import claude_sdk; print('✅ Import successful!')"
+python -c "import claude_code_analytics; print('✅ Import successful!')"
 ```
 
 ## Project Structure
@@ -35,7 +35,7 @@ rust_sdk/
 │   └── ...
 ├── python/                # Python package
 │   ├── pyproject.toml     # Python build configuration
-│   ├── claude_sdk/        # Python package source
+│   ├── claude_code_analytics/        # Python package source
 │   │   └── __init__.py    # Python API exports
 │   └── .venv/             # Python virtual environment
 ├── Cargo.toml             # Rust dependencies and config
@@ -99,7 +99,7 @@ uv build
 uv run -m pytest tests/
 
 # Quick import test
-python -c "import claude_sdk; print('✅ Working!')"
+python -c "import claude_code_analytics; print('✅ Working!')"
 ```
 
 ### Integration Testing
@@ -107,8 +107,8 @@ python -c "import claude_sdk; print('✅ Working!')"
 ```bash
 # Test with real session file
 python -c "
-import claude_sdk
-session = claude_sdk.load('path/to/session.jsonl')
+import claude_code_analytics
+session = claude_code_analytics.load('path/to/session.jsonl')
 print(f'Loaded session with {len(session.messages)} messages')
 "
 ```
@@ -119,7 +119,7 @@ print(f'Loaded session with {len(session.messages)} messages')
 
 1. **Rust changes**: Edit files in `src/`
 2. **Python binding changes**: Edit files in `src/python/`
-3. **Python API changes**: Edit `python/claude_sdk/__init__.py`
+3. **Python API changes**: Edit `python/claude_code_analytics/__init__.py`
 
 ### Rebuilding After Changes
 
@@ -130,7 +130,7 @@ cd python
 uv build
 
 # Test your changes
-python -c "import claude_sdk; # your test code"
+python -c "import claude_code_analytics; # your test code"
 ```
 
 ### Release Build
@@ -149,13 +149,13 @@ ls ../target/wheels/
 
 ### `Cargo.toml`
 - **Package name**: `claude-code-analytics` (matches Python package)
-- **Library name**: `claude_sdk` (matches Python import)
+- **Library name**: `claude_code_analytics` (matches Python import)
 - **Python feature**: Enable with `--features python`
 - **Excludes**: Top-level `python/` directory from Rust build
 
 ### `python/pyproject.toml` 
-- **Module name**: `claude_sdk._core` (Rust extension)
-- **Python packages**: `["claude_sdk"]`
+- **Module name**: `claude_code_analytics._core` (Rust extension)
+- **Python packages**: `["claude_code_analytics"]`
 - **Manifest path**: `../Cargo.toml` (points to Rust config)
 
 ## Common Issues & Solutions
@@ -185,25 +185,25 @@ ls ../target/wheels/
 ## Available Python API
 
 ```python
-import claude_sdk
+import claude_code_analytics
 
 # Core functions
-session = claude_sdk.load("session.jsonl")
-sessions = claude_sdk.find_sessions()
-projects = claude_sdk.find_projects()
-project = claude_sdk.load_project("project_name")
+session = claude_code_analytics.load("session.jsonl")
+sessions = claude_code_analytics.find_sessions()
+projects = claude_code_analytics.find_projects()
+project = claude_code_analytics.load_project("project_name")
 
 # Classes
-claude_sdk.Session       # Session data
-claude_sdk.Message       # Individual messages
-claude_sdk.Project       # Project with multiple sessions
-claude_sdk.ToolResult    # Tool execution results
+claude_code_analytics.Session       # Session data
+claude_code_analytics.Message       # Individual messages
+claude_code_analytics.Project       # Project with multiple sessions
+claude_code_analytics.ToolResult    # Tool execution results
 
 # Exceptions
-claude_sdk.ClaudeSDKError
-claude_sdk.ParseError
-claude_sdk.ValidationError
-claude_sdk.SessionError
+claude_code_analytics.ClaudeSDKError
+claude_code_analytics.ParseError
+claude_code_analytics.ValidationError
+claude_code_analytics.SessionError
 ```
 
 ## Performance Notes
@@ -222,8 +222,8 @@ claude_sdk.SessionError
 cargo clean
 
 # Remove Python build artifacts
-rm -rf python/claude_sdk/*.so
-rm -rf python/claude_sdk/*.pyi
+rm -rf python/claude_code_analytics/*.so
+rm -rf python/claude_code_analytics/*.pyi
 
 # Rebuild everything
 uv build

@@ -52,7 +52,7 @@ class Message(_MessageRecord):
 
     Example:
         ```python
-        from claude_sdk import load
+        from claude_code_analytics import load
 
         # Basic message iteration
         session = load("conversation.jsonl")
@@ -81,7 +81,7 @@ class Message(_MessageRecord):
 
     CLI Usage:
         ```python
-        from claude_sdk import load, find_sessions
+        from claude_code_analytics import load, find_sessions
         import datetime
 
         # Find recent sessions from the last day
