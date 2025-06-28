@@ -1,5 +1,5 @@
 [project]
-name = "claude-sdk"
+name = "claude-code-analytics"
 version = "0.1.0"
 description = "Python SDK for Claude Code with Rust core"
 authors = [{ name = "Darin Kishore", email = "darinkishore@protonmail.com" }]
