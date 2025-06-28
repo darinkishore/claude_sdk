@@ -1,6 +1,6 @@
 [project]
 name = "claude-code-analytics"
-version = "0.1.1"
+version = "0.1.3"
 description = "Python SDK for Claude Code with Rust core"
 authors = [{ name = "Darin Kishore", email = "darinkishore@protonmail.com" }]
 requires-python = ">=3.11"

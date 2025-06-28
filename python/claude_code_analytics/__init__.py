@@ -46,7 +46,7 @@ _find_sessions_internal = _core.find_sessions
 _find_projects_internal = _core.find_projects
 _load_project_internal = _core.load_project
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 
 def load(session_path: Union[str, Path]) -> Session:
