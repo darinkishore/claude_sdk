@@ -1,55 +1,57 @@
 """Claude SDK - Python wrapper for Claude Code sessions.
 
 This SDK provides a clean interface for parsing and analyzing Claude Code
-JSONL session files. It allows you to load session data, access messages, and analyze
-costs, tool usage, and conversation patterns.
+JSONL session files. It allows you to load session data, access messages, and
+analyze costs, tool usage, and conversation patterns.  Refer to the project
+``README.md`` for a complete walkthrough and examples.
 """
 
 from pathlib import Path
 from typing import Optional, Union, List
 
-# Import from Rust core
+# Import the compiled Rust module
 try:
-    from claude_code_analytics._core import (
-        # Main functions
-        load,
-        find_sessions as _find_sessions_internal,
-        find_projects as _find_projects_internal,
-        load_project as _load_project_internal,
-        # Classes
-        Session,
-        Message,
-        Project,
-        # Model classes
-        SessionMetadata,
-        ToolResult,
-        ToolExecution,
-        ConversationStats,
-        ConversationNode,
-        ConversationTree,
-        TextBlock,
-        ToolUseBlock,
-        ThinkingBlock,
-        ImageBlock,
-        ToolResultBlock,
-        TokenUsage,
-        # Exceptions
-        ClaudeSDKError,
-        ParseError,
-        ValidationError,
-        SessionError,
-    )
+    from claude_code_analytics import _core
 except ImportError as e:
     raise ImportError(
         "Failed to import Rust core module. Make sure the package was built with maturin."
-    ) from e
+) from e
+
+from .wrappers import (
+    Session,
+    Message,
+    Project,
+    SessionMetadata,
+    ToolResult,
+    ToolExecution,
+    ConversationStats,
+    ConversationNode,
+    ConversationTree,
+    TextBlock,
+    ToolUseBlock,
+    ThinkingBlock,
+    ImageBlock,
+    ToolResultBlock,
+    TokenUsage,
+)
+
+# Exceptions re-exported for convenience
+ClaudeSDKError = _core.ClaudeSDKError
+ParseError = _core.ParseError
+ValidationError = _core.ValidationError
+SessionError = _core.SessionError
+
+# Bring through functions from the core
+_find_sessions_internal = _core.find_sessions
+_find_projects_internal = _core.find_projects
+_load_project_internal = _core.load_project
 
 __version__ = "0.1.0"
 
-# All classes are now imported from Rust
 
-
-# The load function is already imported from Rust, no need to redefine it
+def load(session_path: Union[str, Path]) -> Session:
+    """Load a single Claude Code session file and return a wrapped object."""
+    return Session(_core.load(str(session_path)))
 
 
 def find_sessions(
@@ -101,8 +103,9 @@ def load_project(
     """
     project_str = str(project_identifier)
     base_path_str = str(base_path) if base_path else None
-    
-    return _load_project_internal(project_str, base_path_str)
+
+    proj = _load_project_internal(project_str, base_path_str)
+    return Project(proj)
 
 
 # Type exports for static analysis

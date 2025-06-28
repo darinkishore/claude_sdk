@@ -1,6 +1,6 @@
 # Claude SDK for Python
 
-A high-performance Python library for parsing and analyzing Claude Code session data. Built with Rust for speed, designed with Python developers in mind.
+A high-performance Python library for parsing and analyzing Claude Code session data. Built with Rust for speed, designed with Python developers in mind. Typed wrapper classes expose the Rust functionality with full type hints so your IDE can easily navigate the API.
 
 ## Table of Contents
 
