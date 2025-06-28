@@ -148,7 +148,7 @@ ls ../target/wheels/
 ## Configuration Files
 
 ### `Cargo.toml`
-- **Package name**: `claude-sdk` (matches Python package)
+- **Package name**: `claude-code-analytics` (matches Python package)
 - **Library name**: `claude_sdk` (matches Python import)
 - **Python feature**: Enable with `--features python`
 - **Excludes**: Top-level `python/` directory from Rust build
@@ -239,7 +239,7 @@ python -c "import sys; print(sys.executable)"
 pip list | grep claude
 
 # Reinstall if needed
-pip uninstall claude-sdk
+pip uninstall claude-code-analytics
 uv build
 ```
 

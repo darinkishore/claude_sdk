@@ -79,7 +79,7 @@ Before running these examples, ensure you have:
 
 1. **Claude SDK installed**:
    ```bash
-   pip install claude-sdk
+   pip install claude-code-analytics
    # or for development
    cd ../.. && pip install ./python
    ```

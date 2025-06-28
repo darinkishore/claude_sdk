@@ -1,5 +1,5 @@
 [package]
-name = "claude-sdk"
+name = "claude-code-analytics"
 version = "0.1.0"
 edition = "2021"
 exclude = ["python/.venv", "python/.pytest_cache", "target/", "dist/"]

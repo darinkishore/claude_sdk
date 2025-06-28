@@ -26,15 +26,15 @@ A high-performance Python library for parsing and analyzing Claude Code session 
 ### Install from PyPI (when published)
 
 ```bash
-pip install claude-sdk
+pip install claude-code-analytics
 ```
 
 ### Install from source
 
 ```bash
 # Clone the repository
-git clone https://github.com/darinkishore/claude-sdk.git
-cd claude-sdk
+git clone https://github.com/darinkishore/claude-code-analytics.git
+cd claude-code-analytics
 
 # Or using uv (recommended)
 uv pip install ./python
@@ -559,7 +559,7 @@ The Claude SDK is built with Rust for exceptional performance:
 
 **Solution**: Ensure you've installed the package:
 ```bash
-pip install claude-sdk
+pip install claude-code-analytics
 # or for development
 uv build
 ```
@@ -615,8 +615,8 @@ session = claude_sdk.load("session.jsonl")
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/claude-sdk.git
-cd claude-sdk
+git clone https://github.com/yourusername/claude-code-analytics.git
+cd claude-code-analytics
 
 # Build Rust library
 cargo build --release
@@ -657,6 +657,6 @@ Built with:
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/claude-sdk/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/claude-sdk/discussions)
-- **Documentation**: [Full API Docs](https://yourusername.github.io/claude-sdk/)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/claude-code-analytics/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/claude-code-analytics/discussions)
+- **Documentation**: [Full API Docs](https://yourusername.github.io/claude-code-analytics/)
