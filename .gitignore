@@ -87,6 +87,7 @@ Thumbs.db
 *.jsonl
 !example*.jsonl  # Keep example files if any
 !tests/fixtures/example*.jsonl
+!python/tests/fixtures/*.jsonl
 
 # Old/backup directories
 backup_*/
