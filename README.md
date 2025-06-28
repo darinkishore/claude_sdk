@@ -636,6 +636,10 @@ uv build
 uv run -m pytest tests/
 ```
 
+The Python test suite includes fixtures for malformed JSONL and a multi-megabyte
+session to ensure `ParseError` is raised correctly and large files load
+successfully.
+
 ### Contributing
 
 1. Fork the repository
